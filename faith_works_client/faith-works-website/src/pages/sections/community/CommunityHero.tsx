@@ -3,10 +3,11 @@ import { useGSAP } from "@gsap/react"
 import gsap from "gsap"
 import { AnimatedMosaicHero } from "@/components/AnimatedMosaicHero"
 
-export function CommunityHero() {
+export function CommunityHero({ ready = false }: { ready?: boolean }) {
   const contentRef = useRef<HTMLDivElement>(null)
 
   useGSAP(() => {
+    if (!ready) return
     const tl = gsap.timeline({ defaults: { ease: "power3.out" }, delay: 0.3 })
 
     tl.from("[data-ch-heading] .word", {
@@ -21,18 +22,20 @@ export function CommunityHero() {
         opacity: 0,
         duration: 0.5,
       }, "-=0.3")
-      .fromTo("[data-ch-cta]",
-        { y: 16, opacity: 0, scale: 0.97 },
-        { y: 0, opacity: 1, scale: 1, stagger: 0.1, duration: 0.5, clearProps: "all" },
-        "-=0.2"
-      )
-  }, { scope: contentRef })
+      .from("[data-ch-cta]", {
+        y: 16,
+        opacity: 0,
+        scale: 0.97,
+        stagger: 0.1,
+        duration: 0.5,
+      }, "-=0.2")
+  }, { scope: contentRef, dependencies: [ready] })
 
   const headingWords = "Build your business with people who get it".split(" ")
 
   return (
     <AnimatedMosaicHero>
-      <div ref={contentRef}>
+      <div ref={contentRef} style={ready ? undefined : { visibility: 'hidden' }}>
         <h1
           data-ch-heading
           className="font-heading text-[2.5rem] leading-[1.08] font-bold tracking-tight text-white md:text-6xl lg:text-7xl"

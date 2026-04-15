@@ -46,10 +46,10 @@ function App() {
       <Routes>
         <Route element={<MainLayout />}>
           <Route index element={<HomePage ready={!showLoader} />} />
-          <Route path="about" element={<AboutPage />} />
-          <Route path="programs" element={<ProgramsPage />} />
+          <Route path="about" element={<AboutPage ready={!showLoader} />} />
+          <Route path="programs" element={<ProgramsPage ready={!showLoader} />} />
           <Route path="speaking" element={<SpeakingLPPage />} />
-          <Route path="community" element={<CommunityPage />} />
+          <Route path="community" element={<CommunityPage ready={!showLoader} />} />
           <Route path="blog" element={<BlogPage />} />
           <Route path="media" element={<MediaPage />} />
         </Route>

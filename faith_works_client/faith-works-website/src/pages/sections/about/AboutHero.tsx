@@ -7,7 +7,7 @@ import { ArrowRight, Sparkles } from "lucide-react"
 
 gsap.registerPlugin(ScrollToPlugin)
 
-export function AboutHero() {
+export function AboutHero({ ready = false }: { ready?: boolean }) {
   const heroRef = useRef<HTMLElement>(null)
 
   // Snap to Timeline on the first downward scroll from the hero
@@ -63,6 +63,7 @@ export function AboutHero() {
   }, [])
 
   useGSAP(() => {
+    if (!ready) return
     const tl = gsap.timeline({ defaults: { ease: "power3.out" } })
 
     tl.from("[data-about-tagline]", {
@@ -82,12 +83,14 @@ export function AboutHero() {
         opacity: 0,
         duration: 0.5,
       }, "-=0.3")
-      .fromTo("[data-about-cta]",
-        { y: 16, opacity: 0, scale: 0.97 },
-        { y: 0, opacity: 1, scale: 1, stagger: 0.1, duration: 0.5, clearProps: "all" },
-        "-=0.2"
-      )
-  }, { scope: heroRef })
+      .from("[data-about-cta]", {
+        y: 16,
+        opacity: 0,
+        scale: 0.97,
+        stagger: 0.1,
+        duration: 0.5,
+      }, "-=0.2")
+  }, { scope: heroRef, dependencies: [ready] })
 
   const headingWords = "Where faith meets strategy".split(" ")
 
@@ -101,7 +104,7 @@ export function AboutHero() {
       <div className="pointer-events-none absolute top-0 right-0 h-[500px] w-[500px] translate-x-1/3 -translate-y-1/3 rounded-full bg-brand-pink/10 blur-3xl" />
       <div className="pointer-events-none absolute bottom-0 left-0 h-[400px] w-[400px] -translate-x-1/3 translate-y-1/3 rounded-full bg-brand-gold/10 blur-3xl" />
 
-      <div className="relative mx-auto flex w-full max-w-[var(--container-max)] flex-col items-center py-32 text-center lg:py-40">
+      <div className="relative mx-auto flex w-full max-w-[var(--container-max)] flex-col items-center py-32 text-center lg:py-40" style={ready ? undefined : { visibility: 'hidden' }}>
         {/* Tagline */}
         <div
           data-about-tagline

@@ -11,10 +11,11 @@ import { SpeakingCTA } from "./sections/about/SpeakingCTA"
 
 gsap.registerPlugin(ScrollTrigger)
 
-export default function AboutPage() {
+export default function AboutPage({ ready = false }: { ready?: boolean }) {
   const containerRef = useRef<HTMLDivElement>(null)
 
   useGSAP(() => {
+    if (!ready) return
     const sections = gsap.utils.toArray<HTMLElement>("[data-animate]")
     sections.forEach((section) => {
       gsap.from(section, {
@@ -30,11 +31,11 @@ export default function AboutPage() {
         ease: "power3.out",
       })
     })
-  }, { scope: containerRef })
+  }, { scope: containerRef, dependencies: [ready] })
 
   return (
     <div ref={containerRef}>
-      <AboutHero />
+      <AboutHero ready={ready} />
       <Timeline />
       <Mission />
       <MediaPress />
