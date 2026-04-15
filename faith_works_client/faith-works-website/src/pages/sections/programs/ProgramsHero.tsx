@@ -8,24 +8,30 @@ export function ProgramsHero({ ready = false }: { ready?: boolean }) {
 
   useGSAP(() => {
     if (!ready) return
+
+    // Set initial states synchronously before any paint
+    gsap.set("[data-ph-heading] .word", { opacity: 0, y: 80, rotateX: 30 })
+    gsap.set("[data-ph-sub]", { opacity: 0, y: 20 })
+    gsap.set("[data-ph-cta]", { opacity: 0, y: 16, scale: 0.97 })
+
     const tl = gsap.timeline({ defaults: { ease: "power3.out" }, delay: 0.3 })
 
-    tl.from("[data-ph-heading] .word", {
-      y: 80,
-      opacity: 0,
-      rotateX: 30,
+    tl.to("[data-ph-heading] .word", {
+      y: 0,
+      opacity: 1,
+      rotateX: 0,
       stagger: 0.06,
       duration: 0.7,
     })
-      .from("[data-ph-sub]", {
-        y: 20,
-        opacity: 0,
+      .to("[data-ph-sub]", {
+        y: 0,
+        opacity: 1,
         duration: 0.5,
       }, "-=0.3")
-      .from("[data-ph-cta]", {
-        y: 16,
-        opacity: 0,
-        scale: 0.97,
+      .to("[data-ph-cta]", {
+        y: 0,
+        opacity: 1,
+        scale: 1,
         stagger: 0.1,
         duration: 0.5,
       }, "-=0.2")

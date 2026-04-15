@@ -8,24 +8,30 @@ export function CommunityHero({ ready = false }: { ready?: boolean }) {
 
   useGSAP(() => {
     if (!ready) return
+
+    // Set initial states synchronously before any paint
+    gsap.set("[data-ch-heading] .word", { opacity: 0, y: 80, rotateX: 30 })
+    gsap.set("[data-ch-sub]", { opacity: 0, y: 20 })
+    gsap.set("[data-ch-cta]", { opacity: 0, y: 16, scale: 0.97 })
+
     const tl = gsap.timeline({ defaults: { ease: "power3.out" }, delay: 0.3 })
 
-    tl.from("[data-ch-heading] .word", {
-      y: 80,
-      opacity: 0,
-      rotateX: 30,
+    tl.to("[data-ch-heading] .word", {
+      y: 0,
+      opacity: 1,
+      rotateX: 0,
       stagger: 0.06,
       duration: 0.7,
     })
-      .from("[data-ch-sub]", {
-        y: 20,
-        opacity: 0,
+      .to("[data-ch-sub]", {
+        y: 0,
+        opacity: 1,
         duration: 0.5,
       }, "-=0.3")
-      .from("[data-ch-cta]", {
-        y: 16,
-        opacity: 0,
-        scale: 0.97,
+      .to("[data-ch-cta]", {
+        y: 0,
+        opacity: 1,
+        scale: 1,
         stagger: 0.1,
         duration: 0.5,
       }, "-=0.2")

@@ -64,29 +64,36 @@ export function AboutHero({ ready = false }: { ready?: boolean }) {
 
   useGSAP(() => {
     if (!ready) return
+
+    // Set initial states synchronously before any paint
+    gsap.set("[data-about-tagline]", { opacity: 0, y: 20 })
+    gsap.set("[data-about-heading] .word", { opacity: 0, y: 80, rotateX: 30 })
+    gsap.set("[data-about-sub]", { opacity: 0, y: 20 })
+    gsap.set("[data-about-cta]", { opacity: 0, y: 16, scale: 0.97 })
+
     const tl = gsap.timeline({ defaults: { ease: "power3.out" } })
 
-    tl.from("[data-about-tagline]", {
-      y: 20,
-      opacity: 0,
+    tl.to("[data-about-tagline]", {
+      y: 0,
+      opacity: 1,
       duration: 0.5,
     })
-      .from("[data-about-heading] .word", {
-        y: 80,
-        opacity: 0,
-        rotateX: 30,
+      .to("[data-about-heading] .word", {
+        y: 0,
+        opacity: 1,
+        rotateX: 0,
         stagger: 0.06,
         duration: 0.7,
       }, "-=0.2")
-      .from("[data-about-sub]", {
-        y: 20,
-        opacity: 0,
+      .to("[data-about-sub]", {
+        y: 0,
+        opacity: 1,
         duration: 0.5,
       }, "-=0.3")
-      .from("[data-about-cta]", {
-        y: 16,
-        opacity: 0,
-        scale: 0.97,
+      .to("[data-about-cta]", {
+        y: 0,
+        opacity: 1,
+        scale: 1,
         stagger: 0.1,
         duration: 0.5,
       }, "-=0.2")
