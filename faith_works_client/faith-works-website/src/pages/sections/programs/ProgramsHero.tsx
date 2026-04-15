@@ -21,13 +21,11 @@ export function ProgramsHero() {
         opacity: 0,
         duration: 0.5,
       }, "-=0.3")
-      .from("[data-ph-cta]", {
-        y: 16,
-        opacity: 0,
-        scale: 0.97,
-        stagger: 0.1,
-        duration: 0.5,
-      }, "-=0.2")
+      .fromTo("[data-ph-cta]",
+        { y: 16, opacity: 0, scale: 0.97 },
+        { y: 0, opacity: 1, scale: 1, stagger: 0.1, duration: 0.5, clearProps: "all" },
+        "-=0.2"
+      )
   }, { scope: contentRef })
 
   const headingWords = "Programs built for Filipino CEOs".split(" ")

@@ -82,13 +82,11 @@ export function AboutHero() {
         opacity: 0,
         duration: 0.5,
       }, "-=0.3")
-      .from("[data-about-cta]", {
-        y: 16,
-        opacity: 0,
-        scale: 0.97,
-        stagger: 0.1,
-        duration: 0.5,
-      }, "-=0.2")
+      .fromTo("[data-about-cta]",
+        { y: 16, opacity: 0, scale: 0.97 },
+        { y: 0, opacity: 1, scale: 1, stagger: 0.1, duration: 0.5, clearProps: "all" },
+        "-=0.2"
+      )
   }, { scope: heroRef })
 
   const headingWords = "Where faith meets strategy".split(" ")
