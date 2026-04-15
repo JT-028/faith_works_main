@@ -3,6 +3,7 @@ import { MainLayout } from '@/layouts/MainLayout'
 import HomePage from '@/pages/Home'
 import AboutPage from '@/pages/About'
 import ProgramsPage from '@/pages/Programs'
+import SpeakingLPPage from '@/pages/SpeakingLP'
 import CommunityPage from '@/pages/Community'
 import BlogPage from '@/pages/Blog'
 import MediaPage from '@/pages/Media'
@@ -14,6 +15,7 @@ function App() {
         <Route index element={<HomePage />} />
         <Route path="about" element={<AboutPage />} />
         <Route path="programs" element={<ProgramsPage />} />
+        <Route path="speaking" element={<SpeakingLPPage />} />
         <Route path="community" element={<CommunityPage />} />
         <Route path="blog" element={<BlogPage />} />
         <Route path="media" element={<MediaPage />} />

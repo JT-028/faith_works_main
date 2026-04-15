@@ -1,10 +1,13 @@
+import { ProgramsHero } from "./sections/programs/ProgramsHero"
+import { FeaturedProgram } from "./sections/programs/FeaturedProgram"
+import { ProgramCards } from "./sections/programs/ProgramCards"
+
 export default function ProgramsPage() {
   return (
-    <div className="pt-24">
-      <div className="mx-auto max-w-[var(--container-max)] px-6 py-20 lg:px-16">
-        <h1 className="font-heading text-4xl font-bold text-brand-dark">Programs</h1>
-        <p className="mt-4 text-brand-muted">Coming soon.</p>
-      </div>
+    <div>
+      <ProgramsHero />
+      <FeaturedProgram />
+      <ProgramCards />
     </div>
   )
 }
