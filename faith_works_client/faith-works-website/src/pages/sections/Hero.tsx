@@ -6,18 +6,6 @@ import { ArrowRight } from "lucide-react"
 import heroLoopVid from "../../assets/faithworks-hero-loop-vid.mp4"
 import faithworksPhone from "../../assets/faithworks-phone.png"
 
-function ImagePlaceholder({ size = 40 }: { size?: number }) {
-  return (
-    <div className="flex h-full w-full items-center justify-center text-brand-muted/40">
-      <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-        <rect x="3" y="3" width="18" height="18" rx="2" />
-        <circle cx="8.5" cy="8.5" r="1.5" />
-        <path d="m21 15-5-5L5 21" />
-      </svg>
-    </div>
-  )
-}
-
 export function HeroSection() {
   const heroRef = useRef<HTMLElement>(null)
 
