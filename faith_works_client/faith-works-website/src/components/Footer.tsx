@@ -1,5 +1,6 @@
 import { useState } from "react"
 import { Link } from "react-router-dom"
+import faithworks from "../assets/faithworks.png"
 
 function FacebookIcon({ className }: { className?: string }) {
   return (
@@ -67,6 +68,7 @@ const socialLinks = [
 
 export function Footer() {
   const [email, setEmail] = useState("")
+  const [imgError, setImgError] = useState(false)
 
   return (
     <footer className="bg-brand-pink-light px-4 pb-8 pt-10 md:px-8 lg:px-12">
@@ -77,10 +79,19 @@ export function Footer() {
           {/* Brand + email subscribe */}
           <div>
             {/* Logo */}
-            <Link to="/" aria-label="Faith Works home">
-              <span className="font-heading text-2xl font-bold tracking-tight text-brand-dark">
-                Faith<span className="text-brand-gold italic">works</span>
-              </span>
+            <Link to="/" aria-label="Faith Works home" className="inline-block">
+              {!imgError ? (
+                <img
+                  src={faithworks}
+                  alt="Faith Works"
+                  className="h-14 w-auto object-contain"
+                  onError={() => setImgError(true)}
+                />
+              ) : (
+                <span className="font-heading text-2xl font-bold tracking-tight text-brand-dark">
+                  Faith<span className="text-brand-gold italic">works</span>
+                </span>
+              )}
             </Link>
 
             <p className="mt-5 max-w-xs text-sm leading-relaxed text-brand-muted">
@@ -158,8 +169,8 @@ export function Footer() {
                     rel="noopener noreferrer"
                     className="inline-flex items-center gap-2.5 text-sm text-brand-muted transition-colors hover:text-brand-dark"
                   >
-                    <span className="flex h-7 w-7 items-center justify-center rounded-full bg-brand-dark text-white">
-                      <Icon className="h-3.5 w-3.5" />
+                    <span className="flex h-7 w-7 items-center justify-center" style={{ color: '#EFACBA' }}>
+                      <Icon className="h-5 w-5" />
                     </span>
                     {label}
                   </a>

@@ -6,10 +6,11 @@ import { ArrowRight } from "lucide-react"
 import heroLoopVid from "../../assets/faithworks-hero-loop-vid.mp4"
 import faithworksPhone from "../../assets/faithworks-phone.png"
 
-export function HeroSection() {
+export function HeroSection({ ready = false }: { ready?: boolean }) {
   const heroRef = useRef<HTMLElement>(null)
 
   useGSAP(() => {
+    if (!ready) return
     const tl = gsap.timeline({ defaults: { ease: "power3.out" } })
 
     // Text entrance
@@ -80,7 +81,7 @@ export function HeroSection() {
       repeat: -1,
       delay: 2.2,
     })
-  }, { scope: heroRef })
+  }, { scope: heroRef, dependencies: [ready] })
 
   const headlineWords = "Build your brand with strategy and conviction".split(" ")
 
@@ -92,7 +93,7 @@ export function HeroSection() {
         background: "linear-gradient(180deg, var(--color-brand-pink) 0%, var(--color-gradient-pink) 2%, var(--color-brand-pink-light) 25%, var(--color-brand-offwhite) 100%)",
       }}
     >
-      <div className="mx-auto max-w-[var(--container-max)] px-6 lg:px-16">
+      <div className="mx-auto max-w-[var(--container-max)] px-6 lg:px-16" style={ready ? undefined : { visibility: 'hidden' }}>
         {/* Text Content */}
         <div className="flex flex-col items-center text-center">
           <h1

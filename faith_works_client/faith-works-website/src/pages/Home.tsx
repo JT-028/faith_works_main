@@ -12,10 +12,11 @@ import { FinalCTASection } from "./sections/FinalCTA"
 
 gsap.registerPlugin(ScrollTrigger)
 
-export default function HomePage() {
+export default function HomePage({ ready = false }: { ready?: boolean }) {
   const containerRef = useRef<HTMLDivElement>(null)
 
   useGSAP(() => {
+    if (!ready) return
     // Staggered fade-up for all animatable sections
     const sections = gsap.utils.toArray<HTMLElement>("[data-animate]")
     sections.forEach((section) => {
@@ -32,11 +33,11 @@ export default function HomePage() {
         ease: "power3.out",
       })
     })
-  }, { scope: containerRef })
+  }, { scope: containerRef, dependencies: [ready] })
 
   return (
     <div ref={containerRef}>
-      <HeroSection />
+      <HeroSection ready={ready} />
       <SocialProofBar />
       <ProgramsSection />
       <AboutFaithSection />
