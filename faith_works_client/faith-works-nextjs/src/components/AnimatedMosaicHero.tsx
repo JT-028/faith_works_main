@@ -4,20 +4,21 @@ import { useRef } from "react"
 import { useGSAP } from "@gsap/react"
 import gsap from "gsap"
 
-function ImageTile({ height }: { height: string }) {
+const TILE_VARIANTS = [
+  "bg-[#0d1b40]",   // brand navy
+  "bg-[#1a2340]",   // medium navy
+  "bg-[#1e1a2e]",   // dark plum
+  "bg-[#0f1c2e]",   // deep ocean
+  "bg-[#1a1430]",   // deep violet
+  "bg-[#14202e]",   // midnight
+]
+
+function ImageTile({ height, variant = 0 }: { height: string; variant?: number }) {
   return (
     <div
-      className="w-full shrink-0 overflow-hidden rounded-[var(--radius-xl)] bg-[#4a4a4a]"
+      className={`w-full shrink-0 rounded-[var(--radius-xl)] ${TILE_VARIANTS[variant % TILE_VARIANTS.length]}`}
       style={{ height }}
-    >
-      <div className="flex h-full w-full items-center justify-center text-white/10">
-        <svg width={32} height={32} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1">
-          <rect x="3" y="3" width="18" height="18" rx="2" />
-          <circle cx="8.5" cy="8.5" r="1.5" />
-          <path d="m21 15-5-5L5 21" />
-        </svg>
-      </div>
-    </div>
+    />
   )
 }
 
@@ -62,21 +63,21 @@ export function AnimatedMosaicHero({ children, overlayOpacity = "bg-brand-dark/6
         <div className="relative flex-1 overflow-hidden">
           <div data-col="down" className="flex flex-col gap-3 md:gap-4 lg:gap-5">
             {[...COL_1, ...COL_1].map((h, i) => (
-              <ImageTile key={`c1-${i}`} height={h} />
+              <ImageTile key={`c1-${i}`} height={h} variant={i % 6} />
             ))}
           </div>
         </div>
         <div className="relative flex-1 overflow-hidden">
           <div data-col="up" className="flex flex-col gap-3 md:gap-4 lg:gap-5">
             {[...COL_2, ...COL_2].map((h, i) => (
-              <ImageTile key={`c2-${i}`} height={h} />
+              <ImageTile key={`c2-${i}`} height={h} variant={(i + 2) % 6} />
             ))}
           </div>
         </div>
         <div className="relative flex-1 overflow-hidden">
           <div data-col="down" className="flex flex-col gap-3 md:gap-4 lg:gap-5">
             {[...COL_3, ...COL_3].map((h, i) => (
-              <ImageTile key={`c3-${i}`} height={h} />
+              <ImageTile key={`c3-${i}`} height={h} variant={(i + 4) % 6} />
             ))}
           </div>
         </div>
@@ -84,6 +85,12 @@ export function AnimatedMosaicHero({ children, overlayOpacity = "bg-brand-dark/6
 
       {/* Dark overlay */}
       <div className={`pointer-events-none absolute inset-0 ${overlayOpacity}`} />
+
+      {/* Radial glow — centers behind content */}
+      <div
+        className="pointer-events-none absolute left-1/2 top-1/2 h-[520px] w-[520px] -translate-x-1/2 -translate-y-1/2 rounded-full opacity-20 blur-[90px]"
+        style={{ background: "radial-gradient(circle, #EFACBA 0%, #FCE82A 50%, transparent 75%)" }}
+      />
 
       {/* Content */}
       <div className="relative z-10 mx-auto flex max-w-[var(--container-max)] flex-col items-center px-6 text-center">
