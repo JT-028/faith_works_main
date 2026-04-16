@@ -43,6 +43,14 @@ function YouTubeIcon({ className }: { className?: string }) {
   )
 }
 
+function TikTokIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="currentColor" className={className} aria-hidden="true">
+      <path d="M12 2v10.5A4.5 4.5 0 1 0 16.5 8V6.2a6 6 0 1 1-4.5 0V2z" />
+    </svg>
+  )
+}
+
 const programLinks = [
   { href: "/programs", label: "Accelerator" },
   { href: "/programs", label: "AI Workshop" },
@@ -62,9 +70,8 @@ const aboutLinks = [
 const socialLinks = [
   { href: "https://facebook.com", label: "Facebook", Icon: FacebookIcon },
   { href: "https://instagram.com", label: "Instagram", Icon: InstagramIcon },
-  { href: "https://x.com", label: "X", Icon: XIcon },
   { href: "https://linkedin.com", label: "LinkedIn", Icon: LinkedInIcon },
-  { href: "https://youtube.com", label: "YouTube", Icon: YouTubeIcon },
+  { href: "https://tiktok.com", label: "TikTok", Icon: TikTokIcon },
 ]
 
 export function Footer() {
