@@ -1,0 +1,41 @@
+import type { Metadata } from "next"
+import { AppProvider } from "@/context/AppContext"
+import { Navbar } from "@/components/Navbar"
+import { Footer } from "@/components/Footer"
+import { ScrollToTop } from "@/components/ScrollToTop"
+import "./globals.css"
+
+export const metadata: Metadata = {
+  title: {
+    default: "Faith Works — Build Your Brand with Strategy and Conviction",
+    template: "%s | Faith Works",
+  },
+  description:
+    "Where faith meets strategy. Join Filipino entrepreneurs who are building businesses that matter — with strategy and conviction as the foundation.",
+  openGraph: {
+    type: "website",
+    siteName: "Faith Works",
+    locale: "en_US",
+  },
+}
+
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode
+}) {
+  return (
+    <html lang="en">
+      <body>
+        <AppProvider>
+          <ScrollToTop />
+          <div className="flex min-h-screen flex-col">
+            <Navbar />
+            <main className="flex-1">{children}</main>
+            <Footer />
+          </div>
+        </AppProvider>
+      </body>
+    </html>
+  )
+}

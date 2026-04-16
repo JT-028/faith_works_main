@@ -1,0 +1,127 @@
+@import url("https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,500&display=swap");
+@import "tailwindcss";
+
+/*
+ * ============================================
+ * FAITH WORKS — Design Tokens & Global Styles
+ * ============================================
+ * Brand: Warm, modern, founder-led
+ * Font: Poppins (headings + body)
+ * Colors: Pink/Gold gradients, Navy text, Off-white bg
+ */
+
+@theme inline {
+  /* ── Brand Colors ── */
+  --color-brand-pink: #EFACBA;
+  --color-brand-pink-dark: #e8899c;
+  --color-brand-pink-light: #fcf0f2;
+  --color-brand-gold: #FCE82A;
+  --color-brand-gold-light: #fdef6d;
+  --color-brand-navy: #0D1B40;
+  --color-brand-offwhite: #FAFAF7;
+  --color-brand-dark: #0c090a;
+  --color-brand-card: #f2f2f2;
+  --color-brand-muted: #6b7280;
+
+  /* ── Gradient endpoints (used in CSS) ── */
+  --color-gradient-pink: rgb(243, 183, 190);
+  --color-gradient-gold: rgb(253, 233, 47);
+
+  /* ── Layout ── */
+  --container-max: 1280px;
+  --section-padding: 80px;
+  --section-padding-mobile: 48px;
+
+  /* ── Radius ── */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 20px;
+  --radius-xl: 32px;
+  --radius-2xl: 40px;
+
+  /* ── Font Family ── */
+  --font-heading: "Poppins", system-ui, sans-serif;
+  --font-body: "Poppins", system-ui, sans-serif;
+
+  /* ── Shadows ── */
+  --shadow-card: 0 4px 24px rgba(0, 0, 0, 0.06);
+  --shadow-card-hover: 0 8px 40px rgba(0, 0, 0, 0.1);
+  --shadow-button: 0 2px 8px rgba(239, 172, 186, 0.4);
+
+  /* ── Animation ── */
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --duration-normal: 300ms;
+  --duration-slow: 500ms;
+}
+
+/* ── Base Reset ── */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-body);
+  color: var(--color-brand-dark);
+  background-color: var(--color-brand-offwhite);
+  line-height: 1.6;
+  font-size: 16px;
+}
+
+/* ── Custom Scrollbar ── */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-brand-offwhite);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-brand-pink);
+  border-radius: 999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-brand-pink-dark);
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-brand-pink) var(--color-brand-offwhite);
+}
+
+/* ── Reduced Motion ── */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ── Brand Gradient Utility ── */
+@utility gradient-pink-gold {
+  background: linear-gradient(135deg, var(--color-gradient-pink), var(--color-gradient-gold));
+}
+
+@utility gradient-pink-white {
+  background: linear-gradient(180deg, var(--color-brand-pink-light) 0%, var(--color-brand-offwhite) 100%);
+}
+
+/* ── Selection color ── */
+::selection {
+  background-color: var(--color-brand-pink);
+  color: white;
+}
