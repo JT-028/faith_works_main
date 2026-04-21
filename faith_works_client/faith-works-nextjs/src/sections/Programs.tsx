@@ -2,9 +2,9 @@
 
 import Link from "next/link"
 import { ArrowRight } from "lucide-react"
-import ThreeDCarousel, { type ThreeDCarouselItem } from "@/components/ThreeDCarousel"
+import DragCarousel, { type DragCarouselItem } from "@/components/DragCarousel"
 
-const programs: ThreeDCarouselItem[] = [
+const programs: DragCarouselItem[] = [
   {
     id: 1,
     brand: "Accelerator",
@@ -55,9 +55,9 @@ const programs: ThreeDCarouselItem[] = [
 export function ProgramsSection() {
   return (
     <section className="py-[var(--section-padding-mobile)] lg:py-[var(--section-padding)]">
-      <div className="mx-auto max-w-[var(--container-max)] px-6 lg:px-16">
-        {/* Section Header */}
-        <div className="mb-12 text-center lg:mb-16">
+      {/* Section Header — contained */}
+      <div className="mx-auto max-w-[var(--container-max)] px-6 lg:px-16 mb-12 lg:mb-16">
+        <div className="text-center">
           <p className="mb-3 text-sm font-medium tracking-wide text-brand-pink">
             Programs
           </p>
@@ -68,20 +68,22 @@ export function ProgramsSection() {
             Find the path that fits where you are.
           </p>
         </div>
+      </div>
 
-        {/* 3D Carousel */}
-        <ThreeDCarousel items={programs} autoRotate rotateInterval={4000} cardHeight={500} />
+      {/* Full-bleed drag carousel — no horizontal padding so fan cards can spread */}
+      <div className="overflow-visible">
+        <DragCarousel items={programs} cardHeight={500} />
+      </div>
 
-        {/* View All Programs */}
-        <div className="mt-10 text-center">
-          <Link
-            href="/programs"
-            className="inline-flex items-center gap-2 text-sm font-medium text-brand-muted transition-colors hover:text-brand-pink"
-          >
-            View all programs & pricing
-            <ArrowRight size={14} />
-          </Link>
-        </div>
+      {/* View All — contained */}
+      <div className="mx-auto max-w-[var(--container-max)] px-6 lg:px-16 mt-10 text-center">
+        <Link
+          href="/programs"
+          className="inline-flex items-center gap-2 text-sm font-medium text-brand-muted transition-colors hover:text-brand-pink"
+        >
+          View all programs &amp; pricing
+          <ArrowRight size={14} />
+        </Link>
       </div>
     </section>
   )

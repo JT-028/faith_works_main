@@ -9,9 +9,172 @@ import { ArrowRight, Mic, Lightbulb, Rocket } from "lucide-react"
 
 gsap.registerPlugin(ScrollTrigger)
 
+/* ─── Scoped CSS for sticky stacking cards ─────────────────────────────── */
+const CSS = `
+  .pcs-section {
+    --card-height: 440px;
+    --card-margin: 36px;
+    --card-top-offset: 8px;
+    background: #FAFAF7;
+    padding-bottom: calc(3 * var(--card-margin) + 6rem);
+  }
+
+  .pcs-header {
+    text-align: center;
+    padding-top: var(--section-padding, 5rem);
+    padding-bottom: 4rem;
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+    max-width: var(--container-max, 1200px);
+    margin: 0 auto;
+  }
+
+  /* ── Stack container: grid rows give each card scroll distance ── */
+  .pcs-list {
+    list-style: none;
+    padding: 0 5%;
+    margin: 0 auto;
+    max-width: var(--container-max, 1200px);
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: repeat(3, var(--card-height));
+    gap: var(--card-margin);
+    padding-bottom: calc(3 * var(--card-margin));
+    box-sizing: border-box;
+  }
+
+  /* ── Each card is sticky; they visually stack as you scroll ── */
+  .pcs-card {
+    position: sticky;
+    top: 6rem;
+    height: var(--card-height);
+    padding-top: calc(var(--index) * var(--card-top-offset));
+    perspective: 1500px;
+  }
+  .pcs-card:nth-child(1) { --index: 1; --reverse-index: 2; z-index: 1; }
+  .pcs-card:nth-child(2) { --index: 2; --reverse-index: 1; z-index: 2; }
+  .pcs-card:nth-child(3) { --index: 3; --reverse-index: 0; z-index: 3; }
+
+  /* ── Card inner: CSS scroll-driven scale + darken on exit ── */
+  .pcs-card__inner {
+    box-sizing: border-box;
+    padding: clamp(2rem, 3.5vw, 3.5rem);
+    width: 100%;
+    height: 100%;
+    border-radius: 28px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    overflow: hidden;
+    position: relative;
+    transform-origin: 50% 0%;
+    will-change: transform, filter;
+    animation: pcs-scale-card linear forwards;
+    animation-timeline: view();
+    animation-range: exit-crossing 0% exit-crossing 100%;
+  }
+
+  /* ── Brand-palette card backgrounds ── */
+  .pcs-card:nth-child(1) .pcs-card__inner {
+    background: #FFF0F5;
+    color: #0c090a;
+    border: 1px solid rgba(239,172,186,0.35);
+    --pcs-shadow: rgba(239,172,186,0.55);
+  }
+  .pcs-card:nth-child(2) .pcs-card__inner {
+    background: #FFFCE3;
+    color: #0c090a;
+    border: 1px solid rgba(252,232,42,0.4);
+    --pcs-shadow: rgba(220,200,0,0.45);
+  }
+  .pcs-card:nth-child(3) .pcs-card__inner {
+    background: #0D1B40;
+    color: #ffffff;
+    border: 1px solid rgba(255,255,255,0.07);
+    --pcs-shadow: rgba(13,27,64,0.65);
+  }
+
+  /* ── Scale + slight push back as each card exits the viewport top ── */
+  @keyframes pcs-scale-card {
+    to {
+      transform: scale(calc(1 - 0.05 * var(--reverse-index))) translateY(calc(-8px * var(--reverse-index)));
+      filter: brightness(0.72);
+      border-radius: 20px;
+      box-shadow: 0 40px 80px -20px var(--pcs-shadow);
+    }
+  }
+
+  /* ── Tag pill ── */
+  .pcs-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.13em;
+    text-transform: uppercase;
+    padding: 6px 14px;
+    border-radius: 100px;
+    margin-bottom: 1.25rem;
+    width: fit-content;
+  }
+  .pcs-card:nth-child(1) .pcs-tag { background: rgba(239,172,186,0.22); color: #b83050; }
+  .pcs-card:nth-child(2) .pcs-tag { background: rgba(252,232,42,0.3);  color: #6b5800; }
+  .pcs-card:nth-child(3) .pcs-tag { background: rgba(255,255,255,0.1);  color: rgba(255,255,255,0.75); }
+
+  /* ── Card title ── */
+  .pcs-title {
+    font-size: clamp(1.6rem, 3vw, 2.8rem);
+    font-weight: 700;
+    line-height: 1.08;
+    margin: 0 0 1rem;
+    letter-spacing: -0.02em;
+  }
+
+  /* ── Card description ── */
+  .pcs-desc {
+    font-size: clamp(0.9rem, 1.4vw, 1.05rem);
+    line-height: 1.65;
+    max-width: 560px;
+    opacity: 0.72;
+    margin: 0;
+  }
+
+  /* ── CTA button ── */
+  .pcs-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.88rem;
+    font-weight: 600;
+    text-decoration: none;
+    padding: 13px 26px;
+    border-radius: 100px;
+    width: fit-content;
+    transition: gap 0.2s ease, opacity 0.2s ease;
+  }
+  .pcs-cta:hover { gap: 13px; opacity: 0.88; }
+  .pcs-card:nth-child(1) .pcs-cta { background: #EFACBA; color: #fff; }
+  .pcs-card:nth-child(2) .pcs-cta { background: #FCE82A; color: #0c090a; }
+  .pcs-card:nth-child(3) .pcs-cta { background: rgba(255,255,255,0.1); color: #fff; border: 1px solid rgba(255,255,255,0.18); }
+
+  /* ── Ghost number watermark ── */
+  .pcs-num {
+    position: absolute;
+    right: 2rem;
+    top: -0.75rem;
+    font-size: clamp(5rem, 14vw, 11rem);
+    font-weight: 700;
+    line-height: 1;
+    opacity: 0.07;
+    user-select: none;
+    pointer-events: none;
+  }
+`
+
 interface ProgramCard {
+  num: string
   tag: string
-  tagColor: string
   title: string
   description: string
   ctaLabel: string
@@ -21,45 +184,45 @@ interface ProgramCard {
 
 const programs: ProgramCard[] = [
   {
+    num: "01",
     tag: "Workshop",
-    tagColor: "bg-brand-pink/15 text-brand-pink-dark",
     title: "Master AI for your business",
     description:
       "Learn to use AI without the hype. Solo or bring your team. Both tracks work.",
     ctaLabel: "Register",
     ctaHref: "/programs/workshop",
-    icon: <Lightbulb className="h-5 w-5" />,
+    icon: <Lightbulb className="h-4 w-4" />,
   },
   {
+    num: "02",
     tag: "Speaking",
-    tagColor: "bg-brand-gold/15 text-brand-dark",
     title: "Bring Faith to your event",
     description:
       "Corporate events, conferences, retreats. Faith speaks on strategy, AI, and building with conviction.",
     ctaLabel: "Inquire",
     ctaHref: "/speaking",
-    icon: <Mic className="h-5 w-5" />,
+    icon: <Mic className="h-4 w-4" />,
   },
   {
+    num: "03",
     tag: "Accelerator",
-    tagColor: "bg-brand-navy/10 text-brand-navy",
     title: "Six weeks. Real mentorship. Real growth.",
     description:
       "For CEOs and founders serious about building a brand that lasts and scales fast.",
     ctaLabel: "Enroll",
     ctaHref: "/programs/accelerator",
-    icon: <Rocket className="h-5 w-5" />,
+    icon: <Rocket className="h-4 w-4" />,
   },
 ]
 
 export function ProgramCards() {
-  const sectionRef = useRef<HTMLElement>(null)
+  const headingRef = useRef<HTMLDivElement>(null)
 
   useGSAP(() => {
-    gsap.from("[data-pc-heading]", {
+    gsap.from(headingRef.current, {
       immediateRender: false,
       scrollTrigger: {
-        trigger: sectionRef.current,
+        trigger: headingRef.current,
         start: "top 82%",
         toggleActions: "play none none none",
       },
@@ -68,31 +231,14 @@ export function ProgramCards() {
       duration: 0.6,
       ease: "power3.out",
     })
-
-    gsap.from("[data-pc-card]", {
-      immediateRender: false,
-      scrollTrigger: {
-        trigger: "[data-pc-card]",
-        start: "top 85%",
-        toggleActions: "play none none none",
-      },
-      y: 50,
-      opacity: 0,
-      stagger: 0.15,
-      duration: 0.7,
-      ease: "power3.out",
-    })
-  }, { scope: sectionRef })
+  })
 
   return (
-    <section
-      id="programs"
-      ref={sectionRef}
-      className="relative bg-brand-offwhite px-6 pb-[var(--section-padding)] lg:px-16"
-    >
-      <div className="mx-auto max-w-[var(--container-max)]">
+    <>
+      <style dangerouslySetInnerHTML={{ __html: CSS }} />
+      <section id="programs" className="pcs-section">
         {/* Section header */}
-        <div data-pc-heading className="mb-12 text-center lg:mb-16">
+        <div ref={headingRef} className="pcs-header">
           <h2 className="font-heading text-[1.75rem] font-bold tracking-tight text-brand-dark md:text-3xl">
             Choose your path
           </h2>
@@ -101,63 +247,31 @@ export function ProgramCards() {
           </p>
         </div>
 
-        {/* Cards grid */}
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 lg:gap-8">
+        {/* Sticky stacking cards */}
+        <ul className="pcs-list">
           {programs.map((program) => (
-            <div
-              key={program.tag}
-              data-pc-card
-              className="group relative flex flex-col overflow-hidden rounded-[var(--radius-xl)] bg-white shadow-card transition-all duration-500 hover:-translate-y-1 hover:shadow-card-hover"
-            >
-              {/* Image area */}
-              <div className="relative aspect-[16/10] overflow-hidden bg-brand-card">
-                <div className="flex h-full w-full items-center justify-center text-brand-muted/15">
-                  <svg
-                    width={48}
-                    height={48}
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="1"
-                  >
-                    <rect x="3" y="3" width="18" height="18" rx="2" />
-                    <circle cx="8.5" cy="8.5" r="1.5" />
-                    <path d="m21 15-5-5L5 21" />
-                  </svg>
-                </div>
-                {/* Gradient overlay on hover */}
-                <div className="absolute inset-0 bg-gradient-to-t from-brand-dark/10 via-transparent to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
-              </div>
+            <li key={program.num} className="pcs-card">
+              <div className="pcs-card__inner">
+                <span className="pcs-num" aria-hidden="true">{program.num}</span>
 
-              {/* Content */}
-              <div className="flex flex-1 flex-col p-6 lg:p-7">
-                <div className="flex items-center gap-2">
-                  <span className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold tracking-wide uppercase ${program.tagColor}`}>
+                <div>
+                  <span className="pcs-tag">
                     {program.icon}
                     {program.tag}
                   </span>
+                  <h3 className="pcs-title">{program.title}</h3>
+                  <p className="pcs-desc">{program.description}</p>
                 </div>
 
-                <h3 className="mt-4 font-heading text-xl font-bold leading-snug tracking-tight text-brand-dark lg:text-[1.35rem]">
-                  {program.title}
-                </h3>
-
-                <p className="mt-3 flex-1 text-sm leading-relaxed text-brand-muted">
-                  {program.description}
-                </p>
-
-                <Link
-                  href={program.ctaHref}
-                  className="group/link mt-6 inline-flex items-center gap-1.5 text-sm font-semibold text-brand-dark transition-colors hover:text-brand-pink-dark"
-                >
+                <Link href={program.ctaHref} className="pcs-cta">
                   {program.ctaLabel}
-                  <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover/link:translate-x-1" />
+                  <ArrowRight className="h-4 w-4" />
                 </Link>
               </div>
-            </div>
+            </li>
           ))}
-        </div>
-      </div>
-    </section>
+        </ul>
+      </section>
+    </>
   )
 }

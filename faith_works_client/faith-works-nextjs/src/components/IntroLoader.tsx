@@ -3,6 +3,7 @@
 import { useRef, useState } from "react"
 import { useGSAP } from "@gsap/react"
 import gsap from "gsap"
+import Image from "next/image"
 
 interface IntroLoaderProps {
   onComplete: () => void
@@ -19,6 +20,7 @@ export default function IntroLoader({ onComplete }: IntroLoaderProps) {
   const prefixRef = useRef<HTMLSpanElement>(null)
   const wordRef = useRef<HTMLSpanElement>(null)
   const textBlockRef = useRef<HTMLDivElement>(null)
+  const logoRef = useRef<HTMLDivElement>(null)
   const [phase, setPhase] = useState(0)
   const [isDone, setIsDone] = useState(false)
 
@@ -68,7 +70,8 @@ export default function IntroLoader({ onComplete }: IntroLoaderProps) {
     setIsDone(true)
 
     const textBlock = textBlockRef.current
-    if (!textBlock || !containerRef.current) return
+    const logo = logoRef.current
+    if (!textBlock || !containerRef.current || !logo) return
 
     const tl = gsap.timeline({
       onComplete: () => {
@@ -93,8 +96,9 @@ export default function IntroLoader({ onComplete }: IntroLoaderProps) {
     const deltaX = centerX - currentX
     const deltaY = centerY - currentY
 
+    // Phase 1: Move text to center + background to brand pink
     tl.to(containerRef.current, {
-      backgroundColor: "#0D1B40",
+      backgroundColor: "#EFACBA",
       duration: 0.6,
       ease: "power2.inOut",
     })
@@ -106,22 +110,40 @@ export default function IntroLoader({ onComplete }: IntroLoaderProps) {
     )
     tl.to(
       [prefixRef.current, wordRef.current],
-      { color: "#EFACBA", duration: 0.6, ease: "power2.inOut" },
+      { color: "#0c090a", duration: 0.6, ease: "power2.inOut" },
       "<"
     )
 
-    tl.to({}, { duration: 0.5 })
-
+    // Phase 2: Crossfade text → logo
     tl.to(textBlock, {
-      scale: 1.1,
-      duration: 0.25,
+      opacity: 0,
+      scale: 0.92,
+      filter: "blur(6px)",
+      duration: 0.5,
+      ease: "power2.in",
+    }, "+=0.3")
+
+    tl.fromTo(
+      logo,
+      { opacity: 0, scale: 0.85, filter: "blur(10px)" },
+      { opacity: 1, scale: 1, filter: "blur(0px)", duration: 0.7, ease: "power2.out" },
+      "<0.15"
+    )
+
+    // Phase 3: Hold on logo
+    tl.to({}, { duration: 0.6 })
+
+    // Phase 4: Logo exit — scale up + fade out
+    tl.to(logo, {
+      scale: 1.15,
+      duration: 0.3,
       ease: "power2.in",
     })
-    tl.to(textBlock, {
-      scale: 0.95,
+    tl.to(logo, {
+      scale: 0.9,
       opacity: 0,
-      filter: "blur(10px)",
-      duration: 0.35,
+      filter: "blur(12px)",
+      duration: 0.4,
       ease: "power2.in",
     })
   }
@@ -134,6 +156,7 @@ export default function IntroLoader({ onComplete }: IntroLoaderProps) {
       className="fixed inset-0 z-[9999] flex items-end justify-start overflow-hidden"
       style={{ backgroundColor: currentPhase.bg }}
     >
+      {/* Animated text block */}
       <div
         ref={textBlockRef}
         className="mb-[12vh] ml-[8vw] select-none"
@@ -155,6 +178,22 @@ export default function IntroLoader({ onComplete }: IntroLoaderProps) {
             {currentPhase.word}
           </span>
         </div>
+      </div>
+
+      {/* Logo reveal — centered, initially hidden */}
+      <div
+        ref={logoRef}
+        className="absolute inset-0 flex items-center justify-center pointer-events-none"
+        style={{ opacity: 0, willChange: "transform, opacity" }}
+      >
+        <Image
+          src="/images/faithworks-black.png"
+          alt="FaithWorks"
+          width={480}
+          height={280}
+          className="w-[clamp(240px,40vw,480px)] h-auto"
+          priority
+        />
       </div>
     </div>
   )

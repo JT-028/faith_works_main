@@ -137,11 +137,11 @@ export function HeroSection({ ready = false }: { ready?: boolean }) {
         </div>
 
         {/* Overlapping Image Cards */}
-        <div className="relative mx-auto mt-16 max-w-8xl lg:mt-15" style={{ paddingBottom: "58%" }}>
+        <div className="relative mx-auto mt-12 max-w-8xl sm:mt-16 lg:mt-15" style={{ paddingBottom: "clamp(280px, 58%, 720px)" }}>
           {/* Main center card */}
           <div
             data-card-main
-            className="absolute left-[-6%] right-[-6%] top-0 z-10 aspect-[16/8] overflow-hidden rounded-[var(--radius-2xl)] bg-brand-card shadow-[0_8px_40px_rgba(0,0,0,0.08)]"
+            className="absolute inset-x-0 top-0 z-10 aspect-[16/8] overflow-hidden rounded-2xl bg-brand-card shadow-[0_8px_40px_rgba(0,0,0,0.08)] sm:rounded-[var(--radius-2xl)] md:left-[-6%] md:right-[-6%]"
           >
             <video
               src="/videos/faithworks-hero-loop-vid.mp4"
@@ -153,17 +153,17 @@ export function HeroSection({ ready = false }: { ready?: boolean }) {
             />
           </div>
 
-          {/* Left overlapping card (outside main card) */}
+          {/* Left overlapping card */}
           <div
             data-card-left
-            className="absolute left-[-20%] top-[36%] z-20 aspect-square w-[30%] overflow-hidden rounded-[var(--radius-xl)] bg-brand-card shadow-[0_20px_60px_rgba(0,0,0,0.12)]"
+            className="absolute left-[-4%] top-[44%] z-20 aspect-square w-[28%] overflow-hidden rounded-xl bg-brand-card shadow-[0_20px_60px_rgba(0,0,0,0.12)] sm:left-[-10%] sm:top-[38%] sm:w-[26%] md:left-[-16%] md:top-[36%] md:w-[28%] lg:left-[-20%] lg:w-[30%]"
             aria-hidden
           />
 
-          {/* Right overlapping card (outside main card) */}
+          {/* Right overlapping card (phone mockup) */}
           <div
             data-card-right
-            className="absolute right-[-20%] top-[20%] z-20 aspect-[4/5] w-[28%] h-[86%]"
+            className="absolute right-[-4%] top-[26%] z-20 aspect-[4/5] w-[26%] sm:right-[-10%] sm:top-[22%] sm:w-[24%] md:right-[-16%] md:top-[20%] md:w-[26%] lg:right-[-20%] lg:w-[28%] lg:h-[86%]"
             aria-hidden
           >
             <img
