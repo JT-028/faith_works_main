@@ -2,8 +2,7 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { useState, useEffect } from "react"
-import { Menu, X } from "lucide-react"
+import { useEffect, useRef, useState } from "react"
 import Image from "next/image"
 import { cn } from "@/lib/utils"
 
@@ -11,8 +10,15 @@ const NAV_LINKS = [
   { num: "01", href: "/about",     label: "About Faith" },
   { num: "02", href: "/programs",  label: "Programs" },
   { num: "03", href: "/community", label: "Community" },
-  { num: "04", href: "/blog",      label: "Blog" },
-  { num: "05", href: "/media",     label: "Media" },
+  { num: "04", href: "/speaking",  label: "Speaking" },
+  { num: "05", href: "/events",    label: "Events" },
+  { num: "06", href: "/media",     label: "Media" },
+]
+
+const DESKTOP_UTILITY_LINKS = [
+  { href: "/", label: "Home" },
+  { href: "/programs", label: "Apply to Accelerator" },
+  { href: "/community", label: "Join the Community" },
 ]
 
 const OVERLAY_CSS = `
@@ -32,7 +38,9 @@ const OVERLAY_CSS = `
     justify-content: center;
     align-items: flex-start;
     padding: 0 8vw;
-    overflow: hidden;
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior: contain;
     pointer-events: none;
   }
   /* Desktop: button shifts due to wider padding */
@@ -46,7 +54,9 @@ const OVERLAY_CSS = `
 
   /* ── Nav item row: number + link ── */
   .fw-nav-item {
-    overflow: hidden;
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior: contain;
     padding: 0.2rem 0;
   }
   .fw-nav-row {
@@ -67,6 +77,7 @@ const OVERLAY_CSS = `
   .fw-overlay.open .fw-nav-item:nth-child(3) .fw-nav-row { transition-delay: 0.32s; }
   .fw-overlay.open .fw-nav-item:nth-child(4) .fw-nav-row { transition-delay: 0.39s; }
   .fw-overlay.open .fw-nav-item:nth-child(5) .fw-nav-row { transition-delay: 0.46s; }
+  .fw-overlay.open .fw-nav-item:nth-child(6) .fw-nav-row { transition-delay: 0.53s; }
 
   /* Item number */
   .fw-nav-num {
@@ -171,71 +182,515 @@ const OVERLAY_CSS = `
     border-radius: 2px;
   }
   .fw-overlay.open .fw-overlay-accent { opacity: 1; transform: scaleY(1); }
+
+  @keyframes fw-burger-drift {
+    0%, 100% { transform: translateX(0); }
+    50% { transform: translateX(4px); }
+  }
+
+  .fw-desktop-burger {
+    display: inline-flex;
+    flex-direction: column;
+    gap: 0.38rem;
+    color: currentColor;
+  }
+
+  .fw-desktop-burger-bar {
+    display: block;
+    height: 2px;
+    width: 1.7rem;
+    border-radius: 999px;
+    background: currentColor;
+    transform-origin: left center;
+    transition: transform 0.24s ease, opacity 0.2s ease, width 0.24s ease;
+  }
+
+  .fw-desktop-burger:not(.is-open) .fw-desktop-burger-bar:first-child {
+    animation: fw-burger-drift 2.8s ease-in-out infinite;
+  }
+
+  .fw-desktop-burger:not(.is-open) .fw-desktop-burger-bar:last-child {
+    animation: fw-burger-drift 2.8s ease-in-out infinite 0.18s;
+  }
+
+  .fw-desktop-burger.is-open .fw-desktop-burger-bar:last-child {
+    opacity: 0;
+    transform: scaleX(0.35);
+  }
+
+  .fw-desktop-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: auto;
+    height: 75vh;
+    min-height: 75vh;
+    width: 100vw;
+    z-index: 55;
+    pointer-events: none;
+    visibility: hidden;
+    overflow: hidden;
+    border-radius: 0;
+    box-shadow: none;
+    transition: visibility 0.8s ease; 
+  }
+
+  .fw-nav-wipe {
+    position: absolute;
+    inset: 0;
+    transform: translateY(-100%);
+    will-change: transform;
+  }
+
+  .fw-nav-wipe-1 {
+    background: linear-gradient(135deg, #EFACBA 0%, #f8d878 55%, #FCE82A 100%);
+    z-index: 1;
+    transition: transform 0.5s cubic-bezier(0.7, 0, 0.3, 1) 0.15s;
+  }
+
+  .fw-nav-wipe-2 {
+    background: linear-gradient(135deg, #FCE82A 0%, #EFACBA 100%);
+    z-index: 2;
+    transition: transform 0.5s cubic-bezier(0.7, 0, 0.3, 1) 0.05s;
+  }
+
+  .fw-nav-wipe-bg {
+    background: linear-gradient(180deg, #1c82e6 0%, #1978d9 56%, #144d94 100%);
+    z-index: 3;
+    transition: transform 0.5s cubic-bezier(0.7, 0, 0.3, 1) 0s;
+  }
+
+  .fw-nav-wipe-bg::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(180deg, rgba(255,255,255,0.06), transparent 24%),
+      radial-gradient(circle at 20% 30%, rgba(255,255,255,0.08), transparent 28%);
+    opacity: 1;
+  }
+
+  .fw-desktop-overlay.open {
+    pointer-events: auto;
+    visibility: visible;
+  }
+
+  .fw-desktop-overlay.open .fw-nav-wipe {
+    transform: translateY(0);
+  }
+
+  .fw-desktop-overlay.open .fw-nav-wipe-1 {
+    transition: transform 0.65s cubic-bezier(0.22, 1, 0.36, 1) 0s;
+  }
+  
+  .fw-desktop-overlay.open .fw-nav-wipe-2 {
+    transition: transform 0.65s cubic-bezier(0.22, 1, 0.36, 1) 0.08s;
+  }
+
+  .fw-desktop-overlay.open .fw-nav-wipe-bg {
+    transition: transform 0.65s cubic-bezier(0.22, 1, 0.36, 1) 0.16s;
+  }
+
+  .fw-desktop-panel {
+    position: relative;
+    z-index: 4;
+    display: grid;
+    grid-template-columns: minmax(220px, 0.8fr) minmax(400px, 1.15fr);
+    gap: clamp(2rem, 4vw, 4rem);
+    align-items: start;
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: 6.6rem clamp(2.5rem, 4vw, 4rem) 2.25rem;
+  }
+
+  .fw-desktop-side,
+  .fw-desktop-main {
+    position: relative;
+    z-index: 1;
+    transform: translateY(-30px);
+    opacity: 0;
+    transition:
+      transform 0.7s cubic-bezier(0.22, 1, 0.36, 1),
+      opacity 0.45s ease;
+  }
+
+  .fw-desktop-overlay.open .fw-desktop-side,
+  .fw-desktop-overlay.open .fw-desktop-main {
+    transform: translateY(0);
+    opacity: 1;
+  }
+
+  .fw-desktop-overlay.open .fw-desktop-side { transition-delay: 0.28s; }
+  .fw-desktop-overlay.open .fw-desktop-main { transition-delay: 0.36s; }
+
+  .fw-desktop-side {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding-top: 1.4rem;
+    padding-left: 1.5rem;
+  }
+
+  .fw-desktop-side::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 1.8rem;
+    bottom: 0;
+    width: 1px;
+    background: linear-gradient(to bottom, rgba(255,255,255,0.48), rgba(255,255,255,0.08));
+  }
+
+  .fw-side-group {
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+  }
+
+  .fw-side-label,
+  .fw-side-footer {
+    font-size: 0.78rem;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.62);
+  }
+
+  .fw-side-copy {
+    max-width: 19rem;
+    font-size: clamp(0.95rem, 1.2vw, 1.18rem);
+    line-height: 1.4;
+    color: rgba(255,255,255,0.9);
+  }
+
+  .fw-side-links {
+    display: flex;
+    flex-direction: column;
+    gap: 0.55rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .fw-side-link {
+    width: fit-content;
+    color: rgba(255,255,255,0.92);
+    font-size: clamp(1rem, 1.05vw, 1.15rem);
+    font-weight: 500;
+    text-decoration: none;
+    transition: color 0.2s ease, transform 0.25s ease;
+  }
+
+  .fw-side-link:hover,
+  .fw-side-link:focus-visible {
+    color: #fff8d5;
+    transform: translateX(6px);
+  }
+
+  .fw-desktop-main {
+    display: flex;
+    align-items: flex-start;
+    justify-content: flex-end;
+  }
+
+  .fw-desktop-main nav {
+    width: min(100%, 40rem);
+  }
+
+  .fw-desktop-main ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .fw-desktop-item + .fw-desktop-item {
+    margin-top: 0.5rem;
+  }
+
+  .fw-desktop-link {
+    position: relative;
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.75rem;
+    font-size: clamp(2.9rem, 4.8vw, 5rem);
+    line-height: 0.94;
+    font-weight: 600;
+    letter-spacing: -0.06em;
+    color: rgba(255,255,255,0.92);
+    text-decoration: none;
+    transition: color 0.24s ease, transform 0.28s ease;
+  }
+
+  .fw-desktop-link:hover,
+  .fw-desktop-link:focus-visible,
+  .fw-desktop-link.active {
+    color: #fff8d5;
+    transform: translateX(10px);
+  }
+
+  .fw-desktop-link::after {
+    content: '↗';
+    font-size: 0.22em;
+    letter-spacing: 0;
+    transform: translateY(-0.6em);
+    opacity: 0;
+    transition: opacity 0.2s ease, transform 0.28s ease;
+  }
+
+  .fw-desktop-link:hover::after,
+  .fw-desktop-link:focus-visible::after,
+  .fw-desktop-link.active::after {
+    opacity: 1;
+    transform: translate(0.05em, -0.8em);
+  }
+
+  .fw-desktop-link .fw-desktop-num {
+    font-size: 0.18em;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    opacity: 0.55;
+  }
+
+  .fw-desktop-footer {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    padding-top: 1.4rem;
+    color: rgba(255,255,255,0.58);
+    font-size: 0.8rem;
+  }
+
+  @media (max-width: 1023px) {
+    .fw-desktop-overlay {
+      display: none;
+    }
+  }
+
+  /* Ensure mobile overlay is never rendered at desktop breakpoints */
+  @media (min-width: 1024px) {
+    .fw-overlay {
+      display: none !important;
+    }
+  }
+
+  @media (max-height: 840px) {
+    .fw-desktop-panel {
+      padding-top: 4.5rem;
+      padding-bottom: 1.5rem;
+    }
+
+    .fw-desktop-link {
+      font-size: clamp(2.4rem, 4.1vw, 4.25rem);
+    }
+
+    .fw-desktop-footer {
+      padding-top: 1rem;
+    }
+  }
 `
+
+function DesktopMenuButton({ isOpen }: { isOpen: boolean }) {
+  return (
+    <>
+      <span className="sr-only">{isOpen ? "Close menu" : "Open menu"}</span>
+      <span
+        className={cn("fw-desktop-burger hidden lg:inline-flex", isOpen && "is-open")}
+        aria-hidden="true"
+      >
+        <span className="fw-desktop-burger-bar" />
+        <span className="fw-desktop-burger-bar" />
+      </span>
+      <span className="hidden lg:block text-sm font-medium tracking-tight leading-none">
+        {isOpen ? "Close" : ""}
+      </span>
+    </>
+  )
+}
 
 export function Navbar() {
   const pathname = usePathname()
   const [isOpen, setIsOpen] = useState(false)
   const [isScrolled, setIsScrolled] = useState(false)
+  const [isDesktopNavVisible, setIsDesktopNavVisible] = useState(true)
+  const mobileOverlayRef = useRef<HTMLDivElement>(null)
+  const desktopOverlayRef = useRef<HTMLDivElement>(null)
+  const lastFocusedElementRef = useRef<HTMLElement | null>(null)
+  const shouldRestoreFocusRef = useRef(false)
+  const lastScrollYRef = useRef(0)
+  const scrollLockYRef = useRef(0)
+  const hasLockedScrollRef = useRef(false)
+  const justClosedRef = useRef(false)
+
+  function closeMenu(restoreFocus: boolean) {
+    shouldRestoreFocusRef.current = restoreFocus
+    setIsOpen(false)
+    justClosedRef.current = true
+    setTimeout(() => { justClosedRef.current = false }, 400)
+  }
+
+  function toggleMenu() {
+    if (isOpen) {
+      closeMenu(true)
+      return
+    }
+
+    shouldRestoreFocusRef.current = false
+    setIsOpen(true)
+  }
 
   // Close on route change
-  useEffect(() => { setIsOpen(false) }, [pathname])
-
-  // Scroll detection
   useEffect(() => {
-    function onScroll() { setIsScrolled(window.scrollY > 20) }
+    if (!isOpen) return
+    closeMenu(false)
+  }, [pathname])
+
+  // Scroll detection + desktop hide/show behavior.
+  useEffect(() => {
+    lastScrollYRef.current = window.scrollY
+    setIsScrolled(window.scrollY > 20)
+    setIsDesktopNavVisible(true)
+
+    function onScroll() {
+      const currentScrollY = window.scrollY
+      const delta = currentScrollY - lastScrollYRef.current
+
+      setIsScrolled(currentScrollY > 20)
+
+      if (window.innerWidth >= 1024) {
+        if (isOpen || currentScrollY < 24 || delta < -6) {
+          setIsDesktopNavVisible(true)
+        } else if (delta > 8 && !justClosedRef.current) {
+          setIsDesktopNavVisible(false)
+        }
+      } else {
+        setIsDesktopNavVisible(true)
+      }
+
+      lastScrollYRef.current = currentScrollY
+    }
+
     window.addEventListener("scroll", onScroll, { passive: true })
     return () => window.removeEventListener("scroll", onScroll)
-  }, [])
+  }, [isOpen])
+
+  useEffect(() => {
+    if (isOpen) {
+      setIsDesktopNavVisible(true)
+    }
+  }, [isOpen])
 
   // Body scroll lock — covers iOS Safari + Android
   useEffect(() => {
     const html = document.documentElement
     const { body } = document
+    const shellNodes = Array.from(document.querySelectorAll<HTMLElement>("main, footer"))
+
     if (isOpen) {
+      hasLockedScrollRef.current = true
+      scrollLockYRef.current = window.scrollY
       html.style.overflow = "hidden"
       body.style.overflow = "hidden"
       body.style.position = "fixed"
       body.style.inset = "0"
+      body.style.top = `-${scrollLockYRef.current}px`
       body.style.touchAction = "none"
+      shellNodes.forEach((node) => node.setAttribute("inert", ""))
     } else {
       html.style.overflow = ""
       body.style.overflow = ""
       body.style.position = ""
       body.style.inset = ""
+      body.style.top = ""
       body.style.touchAction = ""
+      shellNodes.forEach((node) => node.removeAttribute("inert"))
+
+      if (hasLockedScrollRef.current) {
+        window.scrollTo({ top: scrollLockYRef.current, behavior: "instant" })
+        hasLockedScrollRef.current = false
+      }
     }
+
     return () => {
       html.style.overflow = ""
       body.style.overflow = ""
       body.style.position = ""
       body.style.inset = ""
+      body.style.top = ""
       body.style.touchAction = ""
+      shellNodes.forEach((node) => node.removeAttribute("inert"))
     }
   }, [isOpen])
 
   // Escape key
   useEffect(() => {
     function onKeyDown(e: KeyboardEvent) {
-      if (e.key === "Escape" && isOpen) setIsOpen(false)
+      if (e.key === "Escape" && isOpen) {
+        closeMenu(true)
+        return
+      }
+
+      if (e.key !== "Tab" || !isOpen) return
+
+      const activeOverlay = window.innerWidth >= 1024 ? desktopOverlayRef.current : mobileOverlayRef.current
+      if (!activeOverlay) return
+
+      const focusableItems = Array.from(
+        activeOverlay.querySelectorAll<HTMLElement>(
+          'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])'
+        )
+      )
+
+      if (focusableItems.length === 0) return
+
+      const firstItem = focusableItems[0]
+      const lastItem = focusableItems[focusableItems.length - 1]
+      const activeElement = document.activeElement as HTMLElement | null
+
+      if (e.shiftKey && activeElement === firstItem) {
+        e.preventDefault()
+        lastItem.focus()
+      } else if (!e.shiftKey && activeElement === lastItem) {
+        e.preventDefault()
+        firstItem.focus()
+      }
     }
+
     document.addEventListener("keydown", onKeyDown)
     return () => document.removeEventListener("keydown", onKeyDown)
   }, [isOpen])
 
-  // Close overlay when resized to desktop
   useEffect(() => {
-    function onResize() {
-      if (window.innerWidth >= 1024) setIsOpen(false)
+    const mediaQuery = window.matchMedia("(min-width: 1024px)")
+
+    function handleBreakpointChange() {
+      closeMenu(false)
     }
-    window.addEventListener("resize", onResize, { passive: true })
-    return () => window.removeEventListener("resize", onResize)
+
+    mediaQuery.addEventListener("change", handleBreakpointChange)
+    return () => mediaQuery.removeEventListener("change", handleBreakpointChange)
   }, [])
 
-  // Logo: black version on the light gradient overlay; scroll-aware otherwise
-  const logoSrc = isOpen
-    ? "/images/faithworks-black.png"
-    : isScrolled
+  useEffect(() => {
+    if (!isOpen) {
+      if (shouldRestoreFocusRef.current) {
+        lastFocusedElementRef.current?.focus?.()
+      }
+      shouldRestoreFocusRef.current = false
+      return
+    }
+
+    lastFocusedElementRef.current = document.activeElement as HTMLElement | null
+
+    const activeOverlay = window.innerWidth >= 1024 ? desktopOverlayRef.current : mobileOverlayRef.current
+    const firstFocusable = activeOverlay?.querySelector<HTMLElement>(
+      'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])'
+    )
+
+    firstFocusable?.focus()
+  }, [isOpen])
+
+  const mobileLogoSrc = isOpen
     ? "/images/faithworks.png"
     : "/images/faithworks-black.png"
 
@@ -243,85 +698,139 @@ export function Navbar() {
     <>
       <style dangerouslySetInnerHTML={{ __html: OVERLAY_CSS }} />
 
-      {/* ── Header bar ── */}
-      <header
-        className={cn(
-          "fixed top-0 left-0 right-0 z-[50] transition-all",
-          isScrolled
-            ? "bg-white/60 backdrop-blur-2xl shadow-[0_1px_24px_rgba(239,172,186,0.12)] border-b border-white/40 py-3"
-            : "bg-transparent py-4"
-        )}
-        style={isScrolled ? { backdropFilter: "blur(20px) saturate(1.8)" } : undefined}
-      >
-        <div className="mx-auto flex max-w-[var(--container-max)] items-center justify-between px-6 lg:px-16">
-          {/* Logo */}
-          <Link href="/" aria-label="Faith Works Home" className="relative z-[52]">
-            <Image
-              src={logoSrc}
-              alt="Faith Works"
-              width={140}
-              height={40}
-              className="h-10 w-auto object-contain transition-all duration-300"
-              priority
-            />
-          </Link>
-
-          {/* Desktop nav links */}
-          <ul className="hidden items-center gap-8 lg:flex">
-            {NAV_LINKS.map((link) => (
-              <li key={link.href}>
-                <Link
-                  href={link.href}
-                  className={cn(
-                    "text-sm font-medium transition-colors hover:text-brand-pink",
-                    pathname === link.href ? "text-brand-pink" : "text-brand-dark"
-                  )}
-                >
-                  {link.label}
-                </Link>
-              </li>
-            ))}
-          </ul>
-
-          {/* Desktop CTA */}
-          <Link
-            href="/programs"
-            className="hidden rounded-[var(--radius-md)] gradient-pink-gold px-6 py-2.5 text-sm font-semibold text-brand-dark shadow-[var(--shadow-button)] transition-all hover:scale-[1.02] hover:shadow-[var(--shadow-card-hover)] lg:inline-flex"
-          >
-            Join the Accelerator
-          </Link>
-
-          {/* Mobile hamburger — hidden on desktop */}
-          <button
-            type="button"
-            onClick={() => setIsOpen((v) => !v)}
-            aria-label={isOpen ? "Close menu" : "Open menu"}
-            aria-expanded={isOpen}
-            aria-controls="fw-nav-overlay"
+      <header className="fixed inset-x-0 top-0 z-[60]">
+        <div className="mx-auto max-w-[var(--container-max)] px-4 pt-4 lg:hidden lg:px-0 lg:pt-0">
+          <div
             className={cn(
-              "relative z-[52] flex h-12 w-12 items-center justify-center rounded-2xl transition-all duration-300 lg:hidden",
+              "flex items-center justify-between rounded-[22px] px-4 py-3 transition-all duration-300",
               isOpen
-                ? "bg-white/10 text-white"
+                ? "bg-transparent text-white"
                 : isScrolled
-                ? "bg-brand-pink/12 text-brand-dark hover:bg-brand-pink/22"
-                : "bg-black/6 text-brand-dark hover:bg-black/12"
+                ? "border border-white/55 bg-white/70 text-brand-dark shadow-[0_18px_40px_rgba(12,9,10,0.08)] backdrop-blur-2xl"
+                : "bg-white/40 text-brand-dark backdrop-blur-xl"
             )}
           >
-            <Menu
-              size={20}
+            <Link
+              href="/"
+              aria-label="Faith Works Home"
+              aria-hidden={isOpen}
+              className="relative z-[52]"
+              data-navbar-logo-anchor
+            >
+              <Image
+                src={mobileLogoSrc}
+                alt="Faith Works"
+                width={150}
+                height={60}
+                className="h-10 w-auto object-contain transition-all duration-300"
+                tabIndex={isOpen ? -1 : 0}
+                priority
+              />
+            </Link>
+
+            <button
+              type="button"
+              onClick={toggleMenu}
+              aria-label={isOpen ? "Close menu" : "Open menu"}
+              aria-expanded={isOpen}
+              aria-controls="fw-nav-overlay"
               className={cn(
-                "absolute transition-all duration-300",
-                isOpen ? "opacity-0 rotate-90 scale-50" : "opacity-100 rotate-0 scale-100"
+                "relative z-[52] flex h-12 w-12 items-center justify-center rounded-2xl transition-all duration-300",
+                isOpen
+                  ? "bg-white/10 text-white"
+                  : isScrolled
+                  ? "bg-brand-pink/12 text-brand-dark hover:bg-brand-pink/22"
+                  : "bg-black/6 text-brand-dark hover:bg-black/12"
               )}
-            />
-            <X
-              size={20}
+            >
+              <span
+                className={cn(
+                  "absolute h-px w-5 bg-current transition-all duration-300",
+                  isOpen ? "rotate-45" : "-translate-y-[4px]"
+                )}
+                aria-hidden="true"
+              />
+              <span
+                className={cn(
+                  "absolute h-px w-5 bg-current transition-all duration-300",
+                  isOpen ? "-rotate-45" : "translate-y-[4px]"
+                )}
+                aria-hidden="true"
+              />
+            </button>
+          </div>
+        </div>
+
+        <div
+          className={cn(
+            "hidden w-full lg:block transition-transform",
+            isDesktopNavVisible ? "translate-y-0" : "-translate-y-[150%]"
+          )}
+          style={{
+            transitionDuration: isDesktopNavVisible ? "500ms" : "600ms",
+            transitionTimingFunction: isDesktopNavVisible 
+              ? "cubic-bezier(0.22, 1, 0.36, 1)" 
+              : "cubic-bezier(0.6, -0.05, 0.9, 0.5)",
+            transitionDelay: isDesktopNavVisible ? "0ms" : "0ms"
+          }}
+        >
+          <div
+            className={cn(
+              "relative mx-auto flex items-center justify-between transition-all duration-500",
+              isOpen
+                ? "w-full max-w-none px-8 lg:px-12 xl:px-16 mt-0 h-[5.5rem] rounded-none border-transparent bg-transparent shadow-none backdrop-blur-0 text-white"
+                : isScrolled
+                ? "w-[calc(100vw-2rem)] lg:w-[calc(100vw-4rem)] max-w-none px-8 lg:px-10 mt-4 h-[5rem] rounded-[999px] border border-white/20 bg-brand-pink/15 shadow-[0_20px_54px_rgba(0,0,0,0.15)] backdrop-blur-2xl text-[#202020]"
+                : "w-full max-w-none px-8 lg:px-12 xl:px-16 mt-0 h-[5.5rem] rounded-none border-transparent bg-transparent shadow-none backdrop-blur-0 text-white"
+            )}
+          >
+            <button
+              type="button"
+              onClick={toggleMenu}
+              aria-label={isOpen ? "Close menu" : "Open menu"}
+              aria-expanded={isOpen}
+              aria-controls="fw-desktop-nav-overlay"
+              className="relative z-[62] inline-flex items-center gap-3 py-2 text-left transition-opacity duration-300 hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-current"
+            >
+              <DesktopMenuButton isOpen={isOpen} />
+            </button>
+
+            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+              <Link
+                href="/"
+                aria-label="Faith Works Home"
+                className="relative z-[62] pointer-events-auto"
+                data-navbar-logo-anchor
+              >
+                <Image
+                  src={isScrolled && !isOpen ? "/images/faithworks-black.png" : "/images/faithworks.png"}
+                  alt="Faith Works"
+                  width={230}
+                  height={82}
+                  className={cn(
+                    "w-auto object-contain transition-all duration-500",
+                    isScrolled && !isOpen 
+                      ? "h-[2.5rem]" 
+                      : "h-[3.5rem] drop-shadow-[0_0_18px_rgba(255,255,255,1)]"
+                  )}
+                  priority
+                />
+              </Link>
+            </div>
+
+            <Link
+              href="/programs"
               className={cn(
-                "absolute transition-all duration-300",
-                isOpen ? "opacity-100 rotate-0 scale-100" : "opacity-0 -rotate-90 scale-50"
+                "relative z-[62] inline-flex items-center gap-2 rounded-full border px-6 py-3 text-[15px] font-medium tracking-tight transition-all duration-300",
+                isScrolled && !isOpen
+                  ? "border-transparent bg-[#202020]/5 hover:bg-[#202020]/10 text-[#202020]"
+                  : "border-white/20 bg-transparent hover:bg-white/10 text-white"
               )}
-            />
-          </button>
+            >
+              Join the Accelerator
+              <span aria-hidden="true" className="text-[17px] font-light leading-none">↗</span>
+            </Link>
+          </div>
         </div>
       </header>
 
@@ -330,6 +839,10 @@ export function Navbar() {
         id="fw-nav-overlay"
         className={cn("fw-overlay lg:hidden", isOpen && "open")}
         aria-hidden={!isOpen}
+        aria-label="Site navigation"
+        aria-modal="true"
+        role="dialog"
+        ref={mobileOverlayRef}
       >
         {/* Left accent bar */}
         <div className="fw-overlay-accent" aria-hidden="true" />
@@ -375,6 +888,72 @@ export function Navbar() {
         <div className="fw-overlay-footer" aria-hidden="true">
           <span>Faith Works™</span>
           <span>Where faith meets strategy</span>
+        </div>
+      </div>
+
+      <div
+        id="fw-desktop-nav-overlay"
+        className={cn("fw-desktop-overlay", isOpen && "open")}
+        aria-hidden={!isOpen}
+        aria-label="Site navigation"
+        aria-modal="true"
+        role="dialog"
+        ref={desktopOverlayRef}
+      >
+        <div className="fw-nav-wipe fw-nav-wipe-1" aria-hidden="true" />
+        <div className="fw-nav-wipe fw-nav-wipe-2" aria-hidden="true" />
+        <div className="fw-nav-wipe fw-nav-wipe-bg" aria-hidden="true" />
+
+        <div className="fw-desktop-panel">
+          <aside className="fw-desktop-side" aria-hidden={!isOpen}>
+            <div className="fw-side-group">
+              <span className="fw-side-label">Faith Works</span>
+              <p className="fw-side-copy">
+                Strategy, conviction, and founder-level clarity for entrepreneurs building with purpose.
+              </p>
+
+              <ul className="fw-side-links">
+                {DESKTOP_UTILITY_LINKS.map((link) => (
+                  <li key={link.href}>
+                    <Link
+                      href={link.href}
+                      tabIndex={isOpen ? 0 : -1}
+                      className="fw-side-link"
+                    >
+                      {link.label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <div>
+              <span className="fw-side-footer">For founders who want a brand that sounds like conviction, not noise.</span>
+              <div className="fw-desktop-footer">
+                <span>Faith Works 2026</span>
+                <span>Where faith meets strategy</span>
+              </div>
+            </div>
+          </aside>
+
+          <div className="fw-desktop-main">
+            <nav aria-label="Desktop navigation">
+              <ul>
+                {NAV_LINKS.map((link) => (
+                  <li key={link.href} className="fw-desktop-item">
+                    <Link
+                      href={link.href}
+                      tabIndex={isOpen ? 0 : -1}
+                      className={cn("fw-desktop-link", pathname === link.href && "active")}
+                    >
+                      <span className="fw-desktop-num">{link.num}</span>
+                      <span>{link.label}</span>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </nav>
+          </div>
         </div>
       </div>
     </>

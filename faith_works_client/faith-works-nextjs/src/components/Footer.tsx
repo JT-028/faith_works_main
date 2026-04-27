@@ -56,7 +56,7 @@ const programLinks = [
   { href: "/programs", label: "AI Workshop" },
   { href: "/speaking", label: "Keynote" },
   { href: "/community", label: "Community" },
-  { href: "/blog", label: "Blog" },
+  { href: "/events", label: "Events" },
 ]
 
 const aboutLinks = [

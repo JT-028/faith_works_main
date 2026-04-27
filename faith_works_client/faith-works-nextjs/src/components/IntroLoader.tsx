@@ -21,11 +21,16 @@ export default function IntroLoader({ onComplete }: IntroLoaderProps) {
   const wordRef = useRef<HTMLSpanElement>(null)
   const textBlockRef = useRef<HTMLDivElement>(null)
   const logoRef = useRef<HTMLDivElement>(null)
+  const logoInnerRef = useRef<HTMLDivElement>(null)
   const [phase, setPhase] = useState(0)
   const [isDone, setIsDone] = useState(false)
 
   useGSAP(() => {
     if (isDone) return
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      onComplete()
+      return
+    }
 
     const tl = gsap.timeline({
       onComplete: () => {
@@ -67,20 +72,25 @@ export default function IntroLoader({ onComplete }: IntroLoaderProps) {
   }, { scope: containerRef, dependencies: [phase, isDone] })
 
   function animateToCenter() {
-    setIsDone(true)
-
     const textBlock = textBlockRef.current
     const logo = logoRef.current
-    if (!textBlock || !containerRef.current || !logo) return
+    const logoInner = logoInnerRef.current
+    if (!textBlock || !containerRef.current || !logo || !logoInner) {
+      onComplete()
+      return
+    }
+
+    setIsDone(true)
+
+    const anchors = Array.from(document.querySelectorAll<HTMLElement>("[data-navbar-logo-anchor]"))
+    const visibleAnchor = anchors.find((anchor) => {
+      const rect = anchor.getBoundingClientRect()
+      return rect.width > 0 && rect.height > 0
+    })
 
     const tl = gsap.timeline({
       onComplete: () => {
-        gsap.to(containerRef.current, {
-          yPercent: -100,
-          duration: 0.8,
-          ease: "power3.inOut",
-          onComplete,
-        })
+        onComplete()
       },
     })
 
@@ -96,9 +106,15 @@ export default function IntroLoader({ onComplete }: IntroLoaderProps) {
     const deltaX = centerX - currentX
     const deltaY = centerY - currentY
 
-    // Phase 1: Move text to center + background to brand pink
+    const logoRect = logoInner.getBoundingClientRect()
+    const targetRect = visibleAnchor?.getBoundingClientRect()
+    const translateX = targetRect ? targetRect.left + targetRect.width / 2 - (logoRect.left + logoRect.width / 2) : 0
+    const translateY = targetRect ? targetRect.top + targetRect.height / 2 - (logoRect.top + logoRect.height / 2) : 0
+    const scaleRatio = targetRect && logoRect.width > 0 ? targetRect.width / logoRect.width : 0.38
+
+    // Phase 1: Move text to center + background to white
     tl.to(containerRef.current, {
-      backgroundColor: "#EFACBA",
+      backgroundColor: "#ffffff",
       duration: 0.6,
       ease: "power2.inOut",
     })
@@ -110,7 +126,7 @@ export default function IntroLoader({ onComplete }: IntroLoaderProps) {
     )
     tl.to(
       [prefixRef.current, wordRef.current],
-      { color: "#0c090a", duration: 0.6, ease: "power2.inOut" },
+      { color: "#d28899", duration: 0.6, ease: "power2.inOut" },
       "<"
     )
 
@@ -130,21 +146,23 @@ export default function IntroLoader({ onComplete }: IntroLoaderProps) {
       "<0.15"
     )
 
-    // Phase 3: Hold on logo
-    tl.to({}, { duration: 0.6 })
+    // Phase 3: Hold on logo before handoff
+    tl.to({}, { duration: 0.45 })
 
-    // Phase 4: Logo exit — scale up + fade out
-    tl.to(logo, {
-      scale: 1.15,
-      duration: 0.3,
-      ease: "power2.in",
+    // Phase 4: Move the logo into the visible navbar mark.
+    tl.to(logoInner, {
+      x: translateX,
+      y: translateY,
+      scale: scaleRatio,
+      duration: 0.9,
+      ease: "power3.inOut",
     })
-    tl.to(logo, {
-      scale: 0.9,
+
+    // Phase 5: Fade the loader away so the navbar logo underneath takes over.
+    tl.to(containerRef.current, {
       opacity: 0,
-      filter: "blur(12px)",
-      duration: 0.4,
-      ease: "power2.in",
+      duration: 0.24,
+      ease: "power2.out",
     })
   }
 
@@ -155,12 +173,19 @@ export default function IntroLoader({ onComplete }: IntroLoaderProps) {
       ref={containerRef}
       className="fixed inset-0 z-[9999] flex items-end justify-start overflow-hidden"
       style={{ backgroundColor: currentPhase.bg }}
+      role="status"
+      aria-busy="true"
+      aria-live="polite"
+      aria-label="Loading Faith Works"
     >
+      <span className="sr-only">Loading Faith Works</span>
+
       {/* Animated text block */}
       <div
         ref={textBlockRef}
         className="mb-[12vh] ml-[8vw] select-none"
         style={{ willChange: "transform" }}
+        aria-hidden="true"
       >
         <div className="flex flex-col leading-[0.9]">
           <span
@@ -185,15 +210,18 @@ export default function IntroLoader({ onComplete }: IntroLoaderProps) {
         ref={logoRef}
         className="absolute inset-0 flex items-center justify-center pointer-events-none"
         style={{ opacity: 0, willChange: "transform, opacity" }}
+        aria-hidden="true"
       >
-        <Image
-          src="/images/faithworks-black.png"
-          alt="FaithWorks"
-          width={480}
-          height={280}
-          className="w-[clamp(240px,40vw,480px)] h-auto"
-          priority
-        />
+        <div ref={logoInnerRef} style={{ willChange: "transform, opacity" }}>
+          <Image
+            src="/images/faithworks.png"
+            alt="FaithWorks"
+            width={480}
+            height={280}
+            className="h-auto w-[clamp(240px,40vw,480px)]"
+            priority
+          />
+        </div>
       </div>
     </div>
   )

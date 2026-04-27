@@ -1,6 +1,6 @@
 "use client"
 
-import { createContext, useContext, useState, useEffect, type ReactNode } from "react"
+import { createContext, useContext, useEffect, useRef, useState, type ReactNode } from "react"
 import IntroLoader from "@/components/IntroLoader"
 
 interface AppContextValue {
@@ -11,6 +11,7 @@ const AppContext = createContext<AppContextValue>({ ready: false })
 
 export function AppProvider({ children }: { children: ReactNode }) {
   const [showLoader, setShowLoader] = useState(true)
+  const shellRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     if (showLoader) {
@@ -23,10 +24,28 @@ export function AppProvider({ children }: { children: ReactNode }) {
     }
   }, [showLoader])
 
+  useEffect(() => {
+    const shell = shellRef.current
+    if (!shell) return
+
+    if (showLoader) {
+      shell.setAttribute("inert", "")
+      shell.setAttribute("aria-hidden", "true")
+    } else {
+      shell.removeAttribute("inert")
+      shell.removeAttribute("aria-hidden")
+    }
+
+    return () => {
+      shell.removeAttribute("inert")
+      shell.removeAttribute("aria-hidden")
+    }
+  }, [showLoader])
+
   return (
     <AppContext value={{ ready: !showLoader }}>
       {showLoader && <IntroLoader onComplete={() => setShowLoader(false)} />}
-      {children}
+      <div ref={shellRef}>{children}</div>
     </AppContext>
   )
 }
