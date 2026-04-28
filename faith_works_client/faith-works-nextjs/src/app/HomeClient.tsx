@@ -7,6 +7,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger"
 import { useApp } from "@/context/AppContext"
 import { HeroSection } from "@/sections/Hero"
 import { SocialProofBar } from "@/sections/SocialProof"
+import { StrategicConsultancySection } from "@/sections/StrategicConsultancy"
 import { ProgramsSection } from "@/sections/Programs"
 import { AboutFaithSection } from "@/sections/AboutFaith"
 import { CommunitySection } from "@/sections/Community"
@@ -42,6 +43,7 @@ export default function HomeClient() {
     <div ref={containerRef}>
       <HeroSection ready={ready} />
       <SocialProofBar />
+      <StrategicConsultancySection />
       <ProgramsSection />
       <AboutFaithSection />
       <CommunitySection />

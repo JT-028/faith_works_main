@@ -9,7 +9,7 @@ gsap.registerPlugin(ScrollTrigger)
 
 interface TextRevealProps {
   text: string
-  as?: keyof React.JSX.IntrinsicElements
+  as?: React.ElementType
   className?: string
   delay?: number
 }
@@ -19,7 +19,7 @@ interface TextRevealProps {
  * Splits text into words and applies a high-end "staggered pop-up" effect on scroll.
  */
 export function TextReveal({ text, as: Tag = "span", className = "", delay = 0 }: TextRevealProps) {
-  const containerRef = useRef<HTMLElement>(null)
+  const containerRef = useRef<HTMLElement | null>(null)
   
   // Split the string by spaces, while preserving the spaces for layout
   const words = text.split(/(\s+)/)

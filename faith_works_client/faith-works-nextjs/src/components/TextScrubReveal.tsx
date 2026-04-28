@@ -30,7 +30,7 @@ export function TextScrubReveal({
 
     // 1. Split text into lines and words
     const split = new SplitType(containerRef.current, {
-      types: "lines, words",
+      types: "lines,words",
       tagName: "span",
     })
 

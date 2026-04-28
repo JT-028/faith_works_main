@@ -6,6 +6,7 @@ import { useGSAP } from "@gsap/react"
 import gsap from "gsap"
 import { ScrollTrigger } from "gsap/ScrollTrigger"
 import { ArrowRight } from "lucide-react"
+import { GradientTextReveal } from "@/components/GradientTextReveal"
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -65,12 +66,13 @@ export function AboutFaithSection() {
             <h2 className="font-heading text-3xl font-bold text-brand-dark lg:text-4xl">
               Who is Faith Natividad
             </h2>
-            <p className="mt-5 text-base leading-relaxed text-brand-muted">
-              Faith Natividad is an entrepreneur, brand strategist, AI advocate,
-              and keynote speaker who helps Filipino business owners build brands
-              that actually work. Her approach combines sharp strategy with real
-              conviction — no fluff, no hype.
-            </p>
+            <GradientTextReveal
+              activeColor="rgb(26, 26, 26)"
+              inactiveColor="rgb(185, 185, 185)"
+              className="mt-5 text-base leading-relaxed"
+            >
+              Faith Natividad is an entrepreneur, brand strategist, AI advocate, and keynote speaker who helps Filipino business owners build brands that actually work. Her approach combines sharp strategy with real conviction — no fluff, no hype.
+            </GradientTextReveal>
             <p className="mt-4 text-base leading-relaxed text-brand-muted">
               Through Faith Works, she&apos;s building a community where ambitious
               Filipino CEOs get the structure, clarity, and support they need to
