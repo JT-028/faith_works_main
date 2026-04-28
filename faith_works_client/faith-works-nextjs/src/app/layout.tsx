@@ -4,6 +4,8 @@ import { Navbar } from "@/components/Navbar"
 import { Footer } from "@/components/Footer"
 import { ScrollToTop } from "@/components/ScrollToTop"
 import PageTransition from "@/components/PageTransition"
+import SmoothScroll from "@/components/SmoothScroll"
+import { ChatSupport } from "@/components/ChatSupport"
 import "./globals.css"
 
 export const viewport: Viewport = {
@@ -34,16 +36,20 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <AppProvider>
-          <ScrollToTop />
-          <PageTransition />
-          <div className="flex min-h-screen flex-col">
-            <Navbar />
-            <main className="flex-1">{children}</main>
-            <Footer />
-          </div>
-        </AppProvider>
+        <SmoothScroll>
+          <AppProvider>
+            <ScrollToTop />
+            <PageTransition />
+            <div className="flex min-h-screen flex-col">
+              <Navbar />
+              <main className="flex-1">{children}</main>
+              <Footer />
+            </div>
+            <ChatSupport />
+          </AppProvider>
+        </SmoothScroll>
       </body>
     </html>
   )
 }
+

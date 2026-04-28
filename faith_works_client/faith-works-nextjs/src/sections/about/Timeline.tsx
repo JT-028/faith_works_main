@@ -58,17 +58,13 @@ const NUM = milestones.length
 
 export function Timeline() {
   const [activeIndex, setActiveIndex] = useState(0)
-  // Ref to track current index without triggering re-renders on every scroll frame
   const activeIndexRef = useRef(0)
-  // The tall outer div that absorbs scroll distance
   const wrapperRef = useRef<HTMLDivElement>(null)
-  // The sticky inner panel
+  const panelRef = useRef<HTMLDivElement>(null)
   const cardRef = useRef<HTMLDivElement>(null)
   const headingRef = useRef<HTMLDivElement>(null)
-  // Prevents double-animation: snap event fires it first, onEnter should skip it that time
   const headingAnimatedBySnap = useRef(false)
 
-  // Fire heading animation when snap scroll from hero lands here
   useEffect(() => {
     function onSnapArrival() {
       if (!headingRef.current) return
@@ -83,63 +79,12 @@ export function Timeline() {
     return () => window.removeEventListener("faithworks:timeline-snap", onSnapArrival)
   }, [])
 
-  // Reverse snap — upward scroll from timeline top snaps back to hero
-  useEffect(() => {
-    let snapping = false
-
-    function snapToHero() {
-      if (snapping) return
-      const heroEl = document.querySelector<HTMLElement>("[data-about-hero]")
-      if (!heroEl) return
-      snapping = true
-      gsap.to(window, {
-        scrollTo: { y: 0 },
-        duration: 0.9,
-        ease: "power3.inOut",
-        onComplete: () => { snapping = false },
-      })
-    }
-
-    function isAtTimelineTop() {
-      if (!wrapperRef.current) return false
-      return window.scrollY <= wrapperRef.current.offsetTop + 10
-    }
-
-    function onWheel(e: WheelEvent) {
-      if (!isAtTimelineTop()) return
-      if (e.deltaY >= 0) return
-      e.preventDefault()
-      snapToHero()
-    }
-
-    let touchStartY = 0
-    function onTouchStart(e: TouchEvent) {
-      touchStartY = e.touches[0].clientY
-    }
-    function onTouchEnd(e: TouchEvent) {
-      if (!isAtTimelineTop()) return
-      const delta = touchStartY - e.changedTouches[0].clientY
-      if (delta < -40) snapToHero()
-    }
-
-    window.addEventListener("wheel", onWheel, { passive: false })
-    window.addEventListener("touchstart", onTouchStart, { passive: true })
-    window.addEventListener("touchend", onTouchEnd, { passive: true })
-
-    return () => {
-      window.removeEventListener("wheel", onWheel)
-      window.removeEventListener("touchstart", onTouchStart)
-      window.removeEventListener("touchend", onTouchEnd)
-    }
-  }, [])
-
   useGSAP(() => {
-    // ── Heading entrance: also fires on native scroll into the section ──
+    // ── Heading entrance ──
     ScrollTrigger.create({
       trigger: wrapperRef.current,
       start: "top top",
       onEnter: () => {
-        // Skip if the snap animation already ran — consume the flag
         if (headingAnimatedBySnap.current) {
           headingAnimatedBySnap.current = false
           return
@@ -162,7 +107,6 @@ export function Timeline() {
       start: "top top",
       end: "bottom bottom",
       onUpdate: (self) => {
-        // Map 0→1 progress to 0→(NUM-1) steps
         const rawIdx = self.progress * (NUM - 1)
         const newIdx = Math.min(NUM - 1, Math.round(rawIdx))
 
@@ -171,7 +115,6 @@ export function Timeline() {
           activeIndexRef.current = newIdx
           setActiveIndex(newIdx)
 
-          // Animate the card in from the direction of travel
           requestAnimationFrame(() => {
             if (cardRef.current) {
               gsap.fromTo(
@@ -189,16 +132,17 @@ export function Timeline() {
   const active = milestones[activeIndex]
 
   return (
-    // Outer wrapper: tall enough that scrolling through it advances all milestones.
-    // Each milestone gets ~100vh of scroll distance.
     <div
       ref={wrapperRef}
       id="timeline"
       style={{ height: `${NUM * 100}vh` }}
-      className="relative"
+      className="relative w-full"
     >
-      {/* Sticky panel */}
-      <div className="sticky top-0 flex h-screen flex-col bg-white px-6 pt-20 pb-4 lg:px-16 lg:pt-24 lg:pb-8">
+      {/* Pinned panel using proper sticky to prevent GSAP wrap nesting issues */}
+      <div 
+        ref={panelRef} 
+        className="sticky top-0 flex h-screen w-full flex-col bg-white px-6 pt-20 pb-4 lg:px-16 lg:pt-24 lg:pb-8 overflow-hidden"
+      >
 
         {/* ── Section heading — visible on all sizes, compact on mobile ── */}
         <div ref={headingRef} className="mx-auto w-full max-w-[var(--container-max)] opacity-0">

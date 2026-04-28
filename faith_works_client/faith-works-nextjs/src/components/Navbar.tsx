@@ -27,7 +27,10 @@ const OVERLAY_CSS = `
     position: fixed;
     inset: 0;
     z-index: 48;
-    background: linear-gradient(145deg, #EFACBA 0%, #f8d878 55%, #FCE82A 100%);
+    background:
+      radial-gradient(circle at 10% 80%, rgba(239,172,186,0.22) 0%, transparent 45%),
+      radial-gradient(circle at 90% 10%, rgba(252,232,42,0.14), transparent 40%),
+      linear-gradient(160deg, #FAFAF7 0%, #fcf0f2 60%, #FAFAF7 100%);
     /* Default (mobile): button center ≈ calc(100% - 48px), 40px */
     --bx: calc(100% - 48px);
     --by: 40px;
@@ -110,7 +113,7 @@ const OVERLAY_CSS = `
     position: absolute;
     left: 0; bottom: -5px;
     width: 0; height: 3px;
-    background: #b83050;
+    background: #EFACBA;
     border-radius: 2px;
     transition: width 0.35s cubic-bezier(0.22, 1, 0.36, 1);
   }
@@ -689,7 +692,7 @@ export function Navbar() {
     firstFocusable?.focus()
   }, [isOpen])
 
-  const mobileLogoSrc = isOpen
+  const mobileLogoSrc = isScrolled && !isOpen
     ? "/images/faithworks.png"
     : "/images/faithworks-black.png"
 
@@ -703,7 +706,7 @@ export function Navbar() {
             className={cn(
               "flex items-center justify-between rounded-[22px] px-4 py-3 transition-all duration-300",
               isOpen
-                ? "bg-transparent text-white"
+                ? "bg-transparent text-brand-dark"
                 : isScrolled
                 ? "border border-white/55 bg-white/70 text-brand-dark shadow-[0_18px_40px_rgba(12,9,10,0.08)] backdrop-blur-2xl"
                 : "bg-white/40 text-brand-dark backdrop-blur-xl"
@@ -736,7 +739,7 @@ export function Navbar() {
               className={cn(
                 "relative z-[52] flex h-12 w-12 items-center justify-center rounded-2xl transition-all duration-300",
                 isOpen
-                  ? "bg-white/10 text-white"
+                  ? "bg-brand-dark/8 text-brand-dark hover:bg-brand-dark/14"
                   : isScrolled
                   ? "bg-brand-pink/12 text-brand-dark hover:bg-brand-pink/22"
                   : "bg-black/6 text-brand-dark hover:bg-black/12"
