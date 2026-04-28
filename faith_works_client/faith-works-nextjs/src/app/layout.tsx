@@ -3,7 +3,6 @@ import React, { Suspense } from "react"
 import { AppProvider } from "@/context/AppContext"
 import { Navbar } from "@/components/Navbar"
 import { Footer } from "@/components/Footer"
-import { ScrollToTop } from "@/components/ScrollToTop"
 import PageTransition from "@/components/PageTransition"
 import SmoothScroll from "@/components/SmoothScroll"
 import { ChatSupport } from "@/components/ChatSupport"
@@ -40,7 +39,6 @@ export default function RootLayout({
         <Suspense fallback={<></>}>
           <SmoothScroll>
             <AppProvider>
-              <ScrollToTop />
               <PageTransition />
               <div className="flex min-h-screen flex-col">
                 <Navbar />

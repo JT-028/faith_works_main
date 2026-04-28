@@ -114,6 +114,8 @@ export default function PageTransition() {
     const progress = progressRef.current
     if (!panel || !accent || !logo || !progress) return
 
+    // Immediately reset scroll to top using custom event for our SmoothScroll wrapper
+    window.dispatchEvent(new CustomEvent("fw-reset-scroll"))
     window.scrollTo({ top: 0, behavior: "instant" })
 
     const tl = gsap.timeline({
@@ -189,12 +191,16 @@ export default function PageTransition() {
     // Panels must fully cover before we push the new route
     await tl.then()
 
+    // Dispatch scroll reset immediately while the screen is completely covered
+    window.dispatchEvent(new CustomEvent("fw-reset-scroll"))
+    window.scrollTo({ top: 0, behavior: "instant" })
+    
     // Logo + progress bar appear on the solid panel
     gsap.to(logo,     { opacity: 1, scale: 1, duration: 0.3,  ease: "back.out(1.5)" })
     gsap.to(progress, { width: "100%",         duration: 0.45, ease: "power2.inOut" })
 
     // Push route — new page renders silently underneath the covering panels
-    router.push(href)
+    router.push(href, { scroll: true })
 
     // Safety valve stored in a ref so animateOut can cancel it
     safetyTimerRef.current = setTimeout(() => {

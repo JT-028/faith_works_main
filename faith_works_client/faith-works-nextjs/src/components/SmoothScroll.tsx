@@ -33,7 +33,24 @@ export default function SmoothScroll({ children }: { children: ReactNode }) {
 
     gsap.ticker.lagSmoothing(0)
 
+    // Force top scroll on page load
+    if ('scrollRestoration' in window.history) {
+      window.history.scrollRestoration = 'manual'
+    }
+    window.scrollTo(0, 0)
+    lenis.scrollTo(0, { immediate: true })
+
+    const handleCustomReset = () => {
+      // Temporarily halt lenis to clear inertia, then force scroll to 0
+      lenis.stop()
+      lenis.scrollTo(0, { immediate: true, force: true })
+      window.scrollTo(0, 0)
+      lenis.start()
+    }
+    window.addEventListener("fw-reset-scroll", handleCustomReset)
+
     return () => {
+      window.removeEventListener("fw-reset-scroll", handleCustomReset)
       gsap.ticker.remove((time) => {
         lenis.raf(time * 1000)
       })
@@ -42,10 +59,25 @@ export default function SmoothScroll({ children }: { children: ReactNode }) {
     }
   }, [])
 
-  // Reset scroll on route change
+  // Reset scroll on route change explicitly (safety backup to fw-reset-scroll)
   useEffect(() => {
     if (lenisRef.current) {
-      lenisRef.current.scrollTo(0, { immediate: true })
+      // Force scroll reset across the next few frames to outrun Next.js's internal router reconciliation
+      lenisRef.current.stop()
+      window.scrollTo(0, 0)
+      
+      requestAnimationFrame(() => {
+        if (!lenisRef.current) return
+        lenisRef.current.scrollTo(0, { immediate: true, force: true })
+        window.scrollTo(0, 0)
+        
+        setTimeout(() => {
+          if (!lenisRef.current) return
+          lenisRef.current.scrollTo(0, { immediate: true, force: true })
+          window.scrollTo(0, 0)
+          lenisRef.current.start()
+        }, 50)
+      })
     } else {
       window.scrollTo(0, 0)
     }
