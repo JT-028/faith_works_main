@@ -38,11 +38,12 @@ const OVERLAY_CSS = `
     justify-content: center;
     align-items: flex-start;
     padding: 0 8vw;
-    overflow-x: hidden;
-    overflow-y: auto;
-    overscroll-behavior: contain;
+    overflow: hidden;
     pointer-events: none;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
   }
+  .fw-overlay::-webkit-scrollbar { display: none; }
   /* Desktop: button shifts due to wider padding */
   @media (min-width: 1024px) {
     .fw-overlay { --bx: calc(100% - 72px); }
@@ -54,9 +55,7 @@ const OVERLAY_CSS = `
 
   /* ── Nav item row: number + link ── */
   .fw-nav-item {
-    overflow-x: hidden;
-    overflow-y: auto;
-    overscroll-behavior: contain;
+    overflow: hidden;
     padding: 0.2rem 0;
   }
   .fw-nav-row {
@@ -102,8 +101,8 @@ const OVERLAY_CSS = `
     position: relative;
     transition: color 0.22s ease;
   }
-  .fw-nav-link:hover  { color: #b83050; }
-  .fw-nav-link.active { color: #b83050; }
+  .fw-nav-link:hover  { color: #EFACBA; }
+  .fw-nav-link.active { color: #EFACBA; }
 
   /* Deep-rose underline on hover / active */
   .fw-nav-link::after {
@@ -256,7 +255,7 @@ const OVERLAY_CSS = `
   }
 
   .fw-nav-wipe-bg {
-    background: linear-gradient(180deg, #1c82e6 0%, #1978d9 56%, #144d94 100%);
+    background: linear-gradient(160deg, #FAFAF7 0%, #fcf0f2 60%, #FAFAF7 100%);
     z-index: 3;
     transition: transform 0.5s cubic-bezier(0.7, 0, 0.3, 1) 0s;
   }
@@ -266,8 +265,8 @@ const OVERLAY_CSS = `
     position: absolute;
     inset: 0;
     background:
-      linear-gradient(180deg, rgba(255,255,255,0.06), transparent 24%),
-      radial-gradient(circle at 20% 30%, rgba(255,255,255,0.08), transparent 28%);
+      radial-gradient(circle at 10% 80%, rgba(239,172,186,0.18) 0%, transparent 42%),
+      radial-gradient(circle at 90% 10%, rgba(252,232,42,0.12), transparent 38%);
     opacity: 1;
   }
 
@@ -339,7 +338,7 @@ const OVERLAY_CSS = `
     top: 1.8rem;
     bottom: 0;
     width: 1px;
-    background: linear-gradient(to bottom, rgba(255,255,255,0.48), rgba(255,255,255,0.08));
+    background: linear-gradient(to bottom, rgba(12,9,10,0.22), rgba(12,9,10,0.04));
   }
 
   .fw-side-group {
@@ -354,14 +353,14 @@ const OVERLAY_CSS = `
     font-weight: 500;
     letter-spacing: 0.08em;
     text-transform: uppercase;
-    color: rgba(255,255,255,0.62);
+    color: rgba(12,9,10,0.45);
   }
 
   .fw-side-copy {
     max-width: 19rem;
     font-size: clamp(0.95rem, 1.2vw, 1.18rem);
     line-height: 1.4;
-    color: rgba(255,255,255,0.9);
+    color: rgba(12,9,10,0.82);
   }
 
   .fw-side-links {
@@ -375,7 +374,7 @@ const OVERLAY_CSS = `
 
   .fw-side-link {
     width: fit-content;
-    color: rgba(255,255,255,0.92);
+    color: rgba(12,9,10,0.78);
     font-size: clamp(1rem, 1.05vw, 1.15rem);
     font-weight: 500;
     text-decoration: none;
@@ -384,7 +383,7 @@ const OVERLAY_CSS = `
 
   .fw-side-link:hover,
   .fw-side-link:focus-visible {
-    color: #fff8d5;
+    color: #b83050;
     transform: translateX(6px);
   }
 
@@ -417,7 +416,7 @@ const OVERLAY_CSS = `
     line-height: 0.94;
     font-weight: 600;
     letter-spacing: -0.06em;
-    color: rgba(255,255,255,0.92);
+    color: rgba(12,9,10,0.82);
     text-decoration: none;
     transition: color 0.24s ease, transform 0.28s ease;
   }
@@ -425,7 +424,7 @@ const OVERLAY_CSS = `
   .fw-desktop-link:hover,
   .fw-desktop-link:focus-visible,
   .fw-desktop-link.active {
-    color: #fff8d5;
+    color: #EFACBA;
     transform: translateX(10px);
   }
 
@@ -457,7 +456,7 @@ const OVERLAY_CSS = `
     justify-content: space-between;
     gap: 1rem;
     padding-top: 1.4rem;
-    color: rgba(255,255,255,0.58);
+    color: rgba(12,9,10,0.38);
     font-size: 0.8rem;
   }
 
@@ -778,7 +777,7 @@ export function Navbar() {
             className={cn(
               "relative mx-auto flex items-center justify-between transition-all duration-500",
               isOpen
-                ? "w-full max-w-none px-8 lg:px-12 xl:px-16 mt-0 h-[5.5rem] rounded-none border-transparent bg-transparent shadow-none backdrop-blur-0 text-white"
+                ? "w-full max-w-none px-8 lg:px-12 xl:px-16 mt-0 h-[5.5rem] rounded-none border-transparent bg-transparent shadow-none backdrop-blur-0 text-brand-dark"
                 : isScrolled
                 ? "w-[calc(100vw-2rem)] lg:w-[calc(100vw-4rem)] max-w-none px-8 lg:px-10 mt-4 h-[5rem] rounded-[999px] border border-white/20 bg-brand-pink/15 shadow-[0_20px_54px_rgba(0,0,0,0.15)] backdrop-blur-2xl text-[#202020]"
                 : "w-full max-w-none px-8 lg:px-12 xl:px-16 mt-0 h-[5.5rem] rounded-none border-transparent bg-transparent shadow-none backdrop-blur-0 text-white"
@@ -803,7 +802,7 @@ export function Navbar() {
                 data-navbar-logo-anchor
               >
                 <Image
-                  src={isScrolled && !isOpen ? "/images/faithworks-black.png" : "/images/faithworks.png"}
+                  src={isOpen || (isScrolled && !isOpen) ? "/images/faithworks-black.png" : "/images/faithworks.png"}
                   alt="Faith Works"
                   width={230}
                   height={82}
@@ -811,7 +810,7 @@ export function Navbar() {
                     "w-auto object-contain transition-all duration-500",
                     isScrolled && !isOpen 
                       ? "h-[2.5rem]" 
-                      : "h-[3.5rem] drop-shadow-[0_0_18px_rgba(255,255,255,1)]"
+                      : "h-[3.5rem]"
                   )}
                   priority
                 />
@@ -822,7 +821,9 @@ export function Navbar() {
               href="/programs"
               className={cn(
                 "relative z-[62] inline-flex items-center gap-2 rounded-full border px-6 py-3 text-[15px] font-medium tracking-tight transition-all duration-300",
-                isScrolled && !isOpen
+                isOpen
+                  ? "border-brand-dark/20 bg-transparent hover:bg-brand-dark/6 text-brand-dark"
+                  : isScrolled
                   ? "border-transparent bg-[#202020]/5 hover:bg-[#202020]/10 text-[#202020]"
                   : "border-white/20 bg-transparent hover:bg-white/10 text-white"
               )}

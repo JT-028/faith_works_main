@@ -70,8 +70,8 @@ export function ProgramsSection() {
         </div>
       </div>
 
-      {/* Full-bleed drag carousel — no horizontal padding so fan cards can spread */}
-      <div className="overflow-visible">
+      {/* Full-bleed drag carousel — clip horizontal overflow on mobile so fan cards don't cause scroll */}
+      <div className="overflow-x-clip">
         <DragCarousel items={programs} cardHeight={500} />
       </div>
 

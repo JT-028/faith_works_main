@@ -21,18 +21,15 @@ interface DragCarouselProps {
 }
 
 /* ── Fan spread positions (0 = front card, 1 = right-back, 2 = left-back)
-   Cards are spread like a hand of playing cards — diagonal + rotated.   */
-const FAN = [
-  { x: 0,    y: 0,  rotation: 0,   scale: 1,    opacity: 1, zIndex: 40 }, // front
-  { x: 258,  y: 28, rotation: 10,  scale: 0.90, opacity: 1, zIndex: 30 }, // right
-  { x: -258, y: 28, rotation: -10, scale: 0.90, opacity: 1, zIndex: 20 }, // left
-] as const
-
+   Cards are spread like a hand of playing cards — diagonal + rotated.
+   `spread` is responsive: full on desktop, tight on mobile to prevent overflow. */
 type FanCfg = { x: number; y: number; rotation: number; scale: number; opacity: number; zIndex: number }
 
-function getFanCfg(pos: number): FanCfg {
-  return (FAN[pos as 0 | 1 | 2] as FanCfg | undefined) ??
-    { x: 0, y: 60, rotation: 0, scale: 0.82, opacity: 0, zIndex: 1 }
+function getFanCfg(pos: number, spread: number): FanCfg {
+  if (pos === 0) return { x: 0,       y: 0,  rotation: 0,   scale: 1,    opacity: 1, zIndex: 40 }
+  if (pos === 1) return { x: spread,  y: 28, rotation: 10,  scale: 0.90, opacity: 1, zIndex: 30 }
+  if (pos === 2) return { x: -spread, y: 28, rotation: -10, scale: 0.90, opacity: 1, zIndex: 20 }
+  return { x: 0, y: 60, rotation: 0, scale: 0.82, opacity: 0, zIndex: 1 }
 }
 
 export default function DragCarousel({ items, cardHeight = 500 }: DragCarouselProps) {
@@ -56,8 +53,10 @@ export default function DragCarousel({ items, cardHeight = 500 }: DragCarouselPr
   const lastClientX   = useRef(0)
   const lastVelX      = useRef(0)
 
-  /* portrait card width derived from height */
+  /* portrait card width + fan spread — both derived from container width */
   const [cardWidth, setCardWidth] = useState(340)
+  const [fanSpread, setFanSpread] = useState(258)
+  const fanSpreadRef = useRef(258)
   useEffect(() => {
     const update = () => {
       const cw = containerRef.current?.clientWidth ?? 800
@@ -65,6 +64,11 @@ export default function DragCarousel({ items, cardHeight = 500 }: DragCarouselPr
         ? Math.round(cw * 0.82)
         : Math.min(Math.round(cardHeight * 0.84), 440)
       setCardWidth(w)
+      /* On mobile keep side-cards just barely peeking (≤ 6.5% of viewport width)
+         so they never cause horizontal overflow. Desktop keeps the full 258px spread. */
+      const spread = cw < 640 ? Math.round(cw * 0.065) : 258
+      fanSpreadRef.current = spread
+      setFanSpread(spread)
     }
     update()
     const ro = new ResizeObserver(update)
@@ -96,7 +100,7 @@ export default function DragCarousel({ items, cardHeight = 500 }: DragCarouselPr
     orderRef.current.forEach((itemIdx, fanPos) => {
       const el = cardEls.current[itemIdx]
       if (!el) return
-      const cfg = getFanCfg(fanPos)
+      const cfg = getFanCfg(fanPos, fanSpreadRef.current)
       gsap.set(el, {
         x: cfg.x, y: cfg.y, rotation: cfg.rotation,
         scale: cfg.scale, opacity: cfg.opacity, zIndex: cfg.zIndex,
@@ -108,7 +112,9 @@ export default function DragCarousel({ items, cardHeight = 500 }: DragCarouselPr
         else              { bEl.style.opacity = "0"; bEl.classList.remove("fw-card-border-active") }
       }
     })
-  }, [])
+  // fanSpread state dep ensures initFan re-runs whenever the spread changes on resize
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [fanSpread])
 
   useEffect(() => { initFan() }, [initFan])
 
@@ -133,12 +139,12 @@ export default function DragCarousel({ items, cardHeight = 500 }: DragCarouselPr
     setTopIdx(newOrder[0])
 
     const destPos = newOrder.indexOf(topItemIdx)  // last fan slot
-    const destCfg = getFanCfg(destPos)
+    const destCfg = getFanCfg(destPos, fanSpreadRef.current)
 
     /* ① Snap ALL z-indexes immediately before any motion — prevents overlap during transitions */
     newOrder.forEach((itemIdx, fanPos) => {
       const el = cardEls.current[itemIdx]
-      if (el) gsap.set(el, { zIndex: getFanCfg(fanPos).zIndex })
+      if (el) gsap.set(el, { zIndex: getFanCfg(fanPos, fanSpreadRef.current).zIndex })
     })
 
     /* ① b — Animate borders: outgoing front fades out, incoming front fades in */
@@ -166,7 +172,7 @@ export default function DragCarousel({ items, cardHeight = 500 }: DragCarouselPr
       if (itemIdx === topItemIdx) return
       const el  = cardEls.current[itemIdx]
       if (!el) return
-      const cfg = getFanCfg(fanPos)
+      const cfg = getFanCfg(fanPos, fanSpreadRef.current)
       gsap.to(el, {
         x: cfg.x, y: cfg.y, rotation: cfg.rotation,
         scale: cfg.scale, opacity: cfg.opacity,

@@ -131,16 +131,19 @@ export function CommunitySection() {
           ))}
         </div>
 
-        {/* Benefit Cards — flip-reveal on hover */}
+        {/* Benefit Cards — flip-reveal on hover (desktop) or tap/focus (touch) */}
         <div className="grid gap-6 md:grid-cols-3">
           {benefits.map((benefit) => (
             <div
               key={benefit.title}
               data-community-card
-              className="group relative h-[320px] [perspective:1000px]"
+              className="group relative h-[320px] cursor-pointer outline-none [perspective:1000px]"
+              tabIndex={0}
+              role="button"
+              aria-label={`${benefit.title} — tap for details`}
             >
-              {/* Card inner — flips on hover */}
-              <div className="relative h-full w-full transition-transform duration-500 [transform-style:preserve-3d] group-hover:[transform:rotateY(180deg)]">
+              {/* Card inner — flips on hover or focus */}
+              <div className="relative h-full w-full transition-transform duration-500 [transform-style:preserve-3d] group-hover:[transform:rotateY(180deg)] group-focus:[transform:rotateY(180deg)]">
                 {/* Front face */}
                 <div className="absolute inset-0 flex flex-col items-center justify-center rounded-[var(--radius-xl)] bg-white p-8 text-center shadow-[var(--shadow-card)] [backface-visibility:hidden]">
                   <div className="mb-5 flex h-14 w-14 items-center justify-center rounded-full bg-brand-pink-light transition-transform duration-300 group-hover:scale-110">
@@ -153,7 +156,7 @@ export function CommunitySection() {
                     {benefit.description}
                   </p>
                   <span className="mt-4 text-xs font-medium text-brand-pink">
-                    Hover for details
+                    Tap to flip
                   </span>
                 </div>
 
