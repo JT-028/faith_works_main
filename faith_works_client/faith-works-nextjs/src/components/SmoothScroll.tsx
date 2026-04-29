@@ -10,26 +10,30 @@ export default function SmoothScroll({ children }: { children: ReactNode }) {
   const pathname = usePathname()
   const searchParams = useSearchParams()
   const lenisRef = useRef<Lenis | null>(null)
+  const isHomePage = pathname === "/"
 
   useEffect(() => {
     gsap.registerPlugin(ScrollTrigger)
 
     const lenis = new Lenis({
-      duration: 1.2,
-      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)), // easeOutExpo
+      duration: isHomePage ? 0.55 : 0.85,
+      easing: isHomePage ? (t) => 1 - Math.pow(1 - t, 3) : (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
       orientation: "vertical",
       gestureOrientation: "vertical",
       smoothWheel: true,
+      syncTouch: isHomePage,
       wheelMultiplier: 1,
-      touchMultiplier: 2,
+      touchMultiplier: isHomePage ? 1 : 1.5,
     })
 
     lenisRef.current = lenis
     lenis.on("scroll", ScrollTrigger.update)
 
-    gsap.ticker.add((time) => {
+    const updateLenis = (time: number) => {
       lenis.raf(time * 1000)
-    })
+    }
+
+    gsap.ticker.add(updateLenis)
 
     gsap.ticker.lagSmoothing(0)
 
@@ -51,13 +55,11 @@ export default function SmoothScroll({ children }: { children: ReactNode }) {
 
     return () => {
       window.removeEventListener("fw-reset-scroll", handleCustomReset)
-      gsap.ticker.remove((time) => {
-        lenis.raf(time * 1000)
-      })
+      gsap.ticker.remove(updateLenis)
       lenisRef.current = null
       lenis.destroy()
     }
-  }, [])
+  }, [isHomePage])
 
   // Reset scroll on route change explicitly (safety backup to fw-reset-scroll)
   useEffect(() => {

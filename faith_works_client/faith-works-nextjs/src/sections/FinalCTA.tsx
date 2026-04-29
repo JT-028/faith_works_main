@@ -1,13 +1,7 @@
 "use client"
 
-import { useRef } from "react"
 import Link from "next/link"
-import { useGSAP } from "@gsap/react"
-import gsap from "gsap"
-import { ScrollTrigger } from "gsap/ScrollTrigger"
 import { ArrowRight, Zap, Shield, Clock } from "lucide-react"
-
-gsap.registerPlugin(ScrollTrigger)
 
 const trustPoints = [
   { icon: Zap, text: "Results in 12 weeks" },
@@ -16,27 +10,8 @@ const trustPoints = [
 ]
 
 export function FinalCTASection() {
-  const sectionRef = useRef<HTMLElement>(null)
-
-  useGSAP(() => {
-    gsap.from("[data-cta-content] > *", {
-      immediateRender: false,
-      scrollTrigger: {
-        trigger: sectionRef.current,
-        start: "top 80%",
-        toggleActions: "play none none none",
-      },
-      y: 40,
-      opacity: 0,
-      stagger: 0.1,
-      duration: 0.7,
-      ease: "power3.out",
-    })
-  }, { scope: sectionRef })
-
   return (
     <section
-      ref={sectionRef}
       className="relative overflow-hidden py-[var(--section-padding-mobile)] lg:py-[var(--section-padding)]"
       style={{
         background: "linear-gradient(135deg, var(--color-gradient-pink) 0%, var(--color-brand-pink-light) 100%)",

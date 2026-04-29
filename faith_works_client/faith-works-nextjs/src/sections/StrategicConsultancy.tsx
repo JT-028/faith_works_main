@@ -1,47 +1,10 @@
 "use client"
 
-import { useRef } from "react"
-import { useGSAP } from "@gsap/react"
-import gsap from "gsap"
-import { ScrollTrigger } from "gsap/ScrollTrigger"
 import { GradientTextReveal } from "@/components/GradientTextReveal"
 
-gsap.registerPlugin(ScrollTrigger)
-
 export function StrategicConsultancySection() {
-  const sectionRef = useRef<HTMLElement>(null)
-
-  useGSAP(() => {
-    const tl = gsap.timeline({
-      scrollTrigger: {
-        trigger: sectionRef.current,
-        start: "top 75%",
-      },
-    })
-
-    tl.from("[data-strategy-heading] > *", {
-      y: 30,
-      opacity: 0,
-      stagger: 0.1,
-      duration: 0.8,
-      ease: "power3.out",
-    }).from(
-      "[data-strategy-footer]",
-      {
-        y: 20,
-        opacity: 0,
-        duration: 0.6,
-        ease: "power3.out",
-      },
-      "-=0.4"
-    )
-  }, { scope: sectionRef })
-
   return (
-    <section
-      ref={sectionRef}
-      className="bg-brand-dark py-[var(--section-padding-mobile)] lg:py-[var(--section-padding)]"
-    >
+    <section className="bg-brand-dark py-[var(--section-padding-mobile)] lg:py-[var(--section-padding)]">
       <div className="mx-auto max-w-[var(--container-max)] px-6 lg:px-16">
         <div className="grid gap-16 lg:grid-cols-[1fr_1.5fr] lg:gap-24">
           {/* Left Column */}
@@ -62,14 +25,17 @@ export function StrategicConsultancySection() {
             <GradientTextReveal
               activeColor="rgb(255, 255, 255)"
               inactiveColor="rgb(45, 45, 45)"
-              className="text-2xl font-medium leading-snug tracking-wide md:text-3xl lg:text-[2rem] lg:leading-[1.4]"
+              className="text-2xl font-medium leading-relaxed tracking-wide md:text-3xl lg:text-[2rem]"
+              start="top 82%"
+              end="top 18%"
             >
               <span style={{ WebkitTextFillColor: "var(--color-brand-gold)", color: "var(--color-brand-gold)" }}>FAITH [ai]</span>
               {" "}
               is a strategic consultancy that bridges the gap between human purpose and artificial intelligence.
               <br />
-              <br />
-              We don&apos;t just motivate; we operationalize. In our framework, failure isn&apos;t fatal—it&apos;s just{" "}
+              <span data-reveal-gap-before aria-hidden="true"></span>
+              We don&apos;t just motivate; we
+              operationalize. In our framework, failure isn&apos;t fatal—it&apos;s just{" "}
               <span style={{ WebkitTextFillColor: "var(--color-brand-gold)", color: "var(--color-brand-gold)" }}>data</span>.
               {" "}
               It is the essential feedback loop required to build a business that cannot be stopped.
