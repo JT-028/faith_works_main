@@ -3,9 +3,9 @@ import { ArrowDown } from "lucide-react"
 
 export default function MediaHero() {
   return (
-    <section className="relative overflow-hidden pt-32 pb-20 lg:pt-48 lg:pb-32">
+    <section className="relative overflow-x-hidden overflow-y-visible pt-32 pb-20 lg:pt-48 lg:pb-32">
       {/* Background Elements */}
-      <div className="pointer-events-none absolute inset-0 -z-10">
+      <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
         <div className="absolute top-[-20%] left-1/2 aspect-square w-[800px] -translate-x-1/2 rounded-full bg-brand-pink/20 blur-[120px]" />
         <div className="absolute top-1/4 right-[10%] aspect-square w-[600px] rounded-full bg-brand-gold/10 blur-[100px]" />
       </div>

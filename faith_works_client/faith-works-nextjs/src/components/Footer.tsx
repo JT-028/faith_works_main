@@ -226,7 +226,7 @@ export function Footer() {
       {/* Huge background text underneath card - No overlap margin anymore & much more visible */}
       <div 
         ref={watermarkRef}
-        className="pointer-events-none relative pt-8 flex justify-center overflow-hidden -mb-10 lg:-mb-14"
+        className="pointer-events-none relative pt-8 flex justify-center overflow-hidden -mb-10 lg:-mb-14 opacity-0"
       >
         {/* We use a gradient text mask to make it clearly visible but fading slightly at bottom */}
         <span 

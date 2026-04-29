@@ -31,7 +31,7 @@ export default function SpeakingInquiry() {
     <section
       id="speaking-inquiry"
       ref={sectionRef}
-      className="relative overflow-hidden py-24 lg:py-32"
+      className="relative overflow-x-hidden overflow-y-visible py-24 lg:py-32"
       style={{
         background: "linear-gradient(135deg, var(--color-gradient-pink) 0%, var(--color-brand-pink-light) 100%)",
       }}
