@@ -140,7 +140,16 @@ export default function PageTransition() {
 
         // Fade new page content in — inline style already at opacity:0 so no jump
         if (main) {
-          gsap.to(main, { opacity: 1, y: 0, duration: 0.65, ease: "power3.out" })
+          gsap.to(main, {
+            opacity: 1,
+            y: 0,
+            duration: 0.65,
+            ease: "power3.out",
+            onComplete: () => {
+              // Refresh ScrollTriggers for all pages
+              window.dispatchEvent(new CustomEvent("fw-refresh-triggers"))
+            },
+          })
         }
       },
     })

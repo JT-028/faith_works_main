@@ -85,22 +85,32 @@ export function Footer() {
 
   useGSAP(() => {
     if (!watermarkRef.current) return
-    gsap.fromTo(
-      watermarkRef.current,
-      { y: 150, opacity: 0 },
-      {
-        y: 0,
-        opacity: 1,
-        ease: "power3.out",
-        scrollTrigger: {
-          trigger: watermarkRef.current,
-          start: "top bottom",
-          end: "bottom bottom",
-          scrub: 1,
-        },
-      }
-    )
-  }, [])
+
+    const animate = () => {
+      gsap.fromTo(
+        watermarkRef.current,
+        { y: 150, opacity: 0 },
+        {
+          y: 0,
+          opacity: 1,
+          ease: "power3.out",
+          scrollTrigger: {
+            trigger: watermarkRef.current,
+            start: "top bottom",
+            end: "bottom bottom",
+            scrub: 1,
+            invalidateOnRefresh: true,
+          },
+        }
+      )
+    }
+
+    animate()
+
+    // Re-initialize on route changes or when layout shifts
+    window.addEventListener("fw-refresh-triggers", animate)
+    return () => window.removeEventListener("fw-refresh-triggers", animate)
+  }, { scope: watermarkRef, dependencies: [] })
 
   // Colors based on brand palette:
   // #EFACBA (Pink background)
