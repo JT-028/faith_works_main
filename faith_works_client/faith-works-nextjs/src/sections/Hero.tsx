@@ -144,7 +144,7 @@ export function HeroSection({ ready = false }: { ready?: boolean }) {
             className="absolute inset-x-0 top-0 z-10 aspect-[16/8] overflow-hidden rounded-2xl bg-brand-card shadow-[0_8px_40px_rgba(0,0,0,0.08)] sm:rounded-[var(--radius-2xl)] md:left-[-6%] md:right-[-6%]"
           >
             <video
-              src="/videos/faithworks-hero-loop-vid.mp4"
+              src="https://mf1zxswfy323tltz.public.blob.vercel-storage.com/faith_works_video.mp4"
               autoPlay
               loop
               muted
