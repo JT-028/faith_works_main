@@ -12,14 +12,32 @@ const trustPoints = [
 export function FinalCTASection() {
   return (
     <section
-      className="relative overflow-hidden py-[var(--section-padding-mobile)] lg:py-[var(--section-padding)]"
+      className="relative overflow-visible py-[var(--section-padding-mobile)] lg:py-[var(--section-padding)]"
       style={{
         background: "linear-gradient(135deg, var(--color-gradient-pink) 0%, var(--color-brand-pink-light) 100%)",
       }}
     >
+      {/* Seamless top fade transition extending UPWARD over the previous section */}
+      <div 
+        className="pointer-events-none absolute -top-32 lg:-top-48 left-0 w-full h-32 lg:h-48 z-50 bg-brand-offwhite" 
+        style={{ 
+          WebkitMaskImage: "linear-gradient(to top, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 100%)",
+          maskImage: "linear-gradient(to top, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 100%)"
+        }} 
+      />
+
+      {/* Inner top fade blending down into the pink */}
+      <div 
+        className="pointer-events-none absolute top-0 left-0 w-full h-24 lg:h-32 z-10 bg-brand-offwhite" 
+        style={{ 
+          WebkitMaskImage: "linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 80%)",
+          maskImage: "linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 80%)"
+        }} 
+      />
+
       {/* Background decorative elements */}
-      <div className="pointer-events-none absolute -top-32 -left-32 h-64 w-64 rounded-full bg-brand-gold/10 blur-3xl" />
-      <div className="pointer-events-none absolute -bottom-32 -right-32 h-64 w-64 rounded-full bg-brand-pink/20 blur-3xl" />
+      <div className="pointer-events-none absolute top-0 -left-32 h-64 w-64 rounded-full bg-brand-gold/10 blur-3xl overflow-hidden" />
+      <div className="pointer-events-none absolute -bottom-32 -right-32 h-64 w-64 rounded-full bg-brand-pink/20 blur-3xl overflow-hidden" />
 
       <div
         data-cta-content
