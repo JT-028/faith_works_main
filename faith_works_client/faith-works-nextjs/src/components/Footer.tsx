@@ -1,7 +1,12 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useRef } from "react"
 import Link from "next/link"
+import gsap from "gsap"
+import { useGSAP } from "@gsap/react"
+import { ScrollTrigger } from "gsap/ScrollTrigger"
+
+gsap.registerPlugin(ScrollTrigger)
 
 function FacebookIcon({ className }: { className?: string }) {
   return (
@@ -75,136 +80,163 @@ const socialLinks = [
 ]
 
 export function Footer() {
-  const [email, setEmail] = useState("")
   const [imgError, setImgError] = useState(false)
+  const watermarkRef = useRef<HTMLDivElement>(null)
+
+  useGSAP(() => {
+    if (!watermarkRef.current) return
+    gsap.fromTo(
+      watermarkRef.current,
+      { y: 150, opacity: 0 },
+      {
+        y: 0,
+        opacity: 1,
+        ease: "power3.out",
+        scrollTrigger: {
+          trigger: watermarkRef.current,
+          start: "top bottom",
+          end: "bottom bottom",
+          scrub: 1,
+        },
+      }
+    )
+  }, [])
+
+  // Colors based on brand palette:
+  // #EFACBA (Pink background)
+  // #FCE82A (Gold accents)
+  // #202020 (Dark text)
+  // #FFFFFF (White card inside)
 
   return (
-    <footer className="bg-brand-pink-light px-4 pb-8 pt-10 md:px-8 lg:px-12">
-      {/* Floating white card */}
-      <div className="mx-auto max-w-[var(--container-max)] rounded-[2rem] bg-white px-8 py-12 shadow-sm md:px-12 lg:px-16">
-        <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-[1fr_auto_auto_auto] lg:gap-16">
+    <footer className="relative overflow-hidden bg-[#EFACBA] pb-0 pt-16 md:pt-24">
+      {/* Container for the inner card - Much wider taking up most of screen */}
+      <div className="relative z-10 mx-auto px-4 w-full md:px-8 lg:px-12 max-w-[1920px]">
+        {/* The White Card */}
+        <div className="rounded-[2.5rem] bg-[#FFFFFF] p-8 md:p-12 lg:p-16 shadow-[0_12px_40px_rgba(32,32,32,0.15)] border border-[#202020]/5">
+          
+          <div className="grid gap-12 lg:grid-cols-[1.5fr_1fr_1fr]">
+            {/* Left Col: Brand + Description + Socials */}
+            <div className="flex flex-col items-start">
+              {/* Logo */}
+              <Link href="/" aria-label="Faith Works home" className="inline-block">
+                {!imgError ? (
+                  <img
+                    src="/images/faithworks.png"
+                    alt="Faith Works"
+                    className="h-10 w-auto object-contain"
+                    onError={() => setImgError(true)}
+                  />
+                ) : (
+                  <span className="font-heading text-2xl font-bold tracking-tight text-[#202020]">
+                    Faith<span className="italic text-[#EFACBA]">works</span>
+                  </span>
+                )}
+              </Link>
 
-          {/* Brand + email subscribe */}
-          <div>
-            {/* Logo */}
-            <Link href="/" aria-label="Faith Works home" className="inline-block">
-              {!imgError ? (
-                <img
-                  src="/images/faithworks.png"
-                  alt="Faith Works"
-                  className="h-14 w-auto object-contain"
-                  onError={() => setImgError(true)}
-                />
-              ) : (
-                <span className="font-heading text-2xl font-bold tracking-tight text-brand-dark">
-                  Faith<span className="text-brand-gold italic">works</span>
-                </span>
-              )}
-            </Link>
+              <p className="mt-8 max-w-sm text-sm leading-relaxed text-[#202020]/70">
+                Faith Works empowers entrepreneurs to transform raw challenges into clear, compelling strategy — making growth easier to envision, understand, and achieve.
+              </p>
 
-            <p className="mt-5 max-w-xs text-sm leading-relaxed text-brand-muted">
-              Stay in the loop with real strategy and no fluff.
+              {/* Socials Row */}
+              <div className="mt-8 flex items-center gap-4">
+                <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" className="text-[#202020]/80 transition-colors hover:text-[#EFACBA]">
+                  <FacebookIcon className="h-5 w-5" />
+                </a>
+                <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="text-[#202020]/80 transition-colors hover:text-[#EFACBA]">
+                  <InstagramIcon className="h-5 w-5" />
+                </a>
+                <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" className="text-[#202020]/80 transition-colors hover:text-[#EFACBA]">
+                  <LinkedInIcon className="h-5 w-5" />
+                </a>
+                <a href="https://tiktok.com" target="_blank" rel="noopener noreferrer" className="text-[#202020]/80 transition-colors hover:text-[#EFACBA]">
+                  <TikTokIcon className="h-5 w-5" />
+                </a>
+              </div>
+            </div>
+
+            {/* Middle Col: Programs */}
+            <div>
+              <h4 className="mb-6 font-semibold text-[#202020]">Programs</h4>
+              <ul className="space-y-4">
+                {programLinks.map((link) => (
+                  <li key={link.label}>
+                    <Link
+                      href={link.href}
+                      className="text-sm text-[#202020]/70 transition-colors hover:text-[#EFACBA]"
+                    >
+                      {link.label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Right Col: About */}
+            <div>
+              <h4 className="mb-6 font-semibold text-[#202020]">About</h4>
+              <ul className="space-y-4">
+                {aboutLinks.map((link) => (
+                  <li key={link.label}>
+                    <Link
+                      href={link.href}
+                      className="text-sm text-[#202020]/70 transition-colors hover:text-[#EFACBA]"
+                    >
+                      {link.label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+
+          {/* Divider */}
+          <div className="my-10 border-t border-[#202020]/10" />
+
+          {/* Bottom Bar inside card */}
+          <div className="flex flex-col items-center justify-between gap-4 sm:flex-row">
+            <p className="text-sm text-[#202020]/70">
+              &copy; {new Date().getFullYear()} Faith Works. All rights reserved.
             </p>
-
-            {/* Email form */}
-            <form
-              onSubmit={(e) => { e.preventDefault() }}
-              className="mt-5 flex items-center gap-2"
-            >
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="Your email"
-                required
-                className="h-11 flex-1 rounded-xl border border-gray-200 bg-gray-50 px-4 text-sm text-brand-dark placeholder:text-brand-muted focus:border-brand-pink focus:outline-none focus:ring-2 focus:ring-brand-pink/20"
-              />
-              <button
-                type="submit"
-                className="h-11 shrink-0 rounded-xl bg-brand-dark px-5 text-sm font-semibold text-white transition-colors hover:bg-brand-dark/80"
-              >
-                Subscribe
-              </button>
-            </form>
-            <p className="mt-2.5 text-xs text-brand-muted">
-              We respect your inbox. Unsubscribe anytime.
-            </p>
-          </div>
-
-          {/* Programs */}
-          <div>
-            <h4 className="mb-5 text-sm font-semibold text-brand-dark">Programs</h4>
-            <ul className="space-y-3.5">
-              {programLinks.map((link) => (
-                <li key={link.label}>
-                  <Link
-                    href={link.href}
-                    className="text-sm text-brand-muted transition-colors hover:text-brand-dark"
-                  >
-                    {link.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* About */}
-          <div>
-            <h4 className="mb-5 text-sm font-semibold text-brand-dark">About</h4>
-            <ul className="space-y-3.5">
-              {aboutLinks.map((link) => (
-                <li key={link.label}>
-                  <Link
-                    href={link.href}
-                    className="text-sm text-brand-muted transition-colors hover:text-brand-dark"
-                  >
-                    {link.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Follow us */}
-          <div>
-            <h4 className="mb-5 text-sm font-semibold text-brand-dark">Follow us</h4>
-            <ul className="space-y-3.5">
-              {socialLinks.map(({ href, label, Icon }) => (
-                <li key={label}>
-                  <a
-                    href={href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2.5 text-sm text-brand-muted transition-colors hover:text-brand-dark"
-                  >
-                    <span className="flex h-7 w-7 items-center justify-center" style={{ color: '#EFACBA' }}>
-                      <Icon className="h-5 w-5" />
-                    </span>
-                    {label}
-                  </a>
-                </li>
-              ))}
-            </ul>
+            <div className="flex flex-wrap items-center justify-center gap-6">
+              <a href="/privacy-policy" className="text-sm text-[#202020]/70 underline underline-offset-4 decoration-transparent transition-colors hover:text-[#202020] hover:decoration-[#EFACBA]">
+                Privacy Policy
+              </a>
+              <a href="/terms" className="text-sm text-[#202020]/70 underline underline-offset-4 decoration-transparent transition-colors hover:text-[#202020] hover:decoration-[#EFACBA]">
+                Terms of Service
+              </a>
+              <a href="/cookies" className="text-sm text-[#202020]/70 underline underline-offset-4 decoration-transparent transition-colors hover:text-[#202020] hover:decoration-[#EFACBA]">
+                Cookies Settings
+              </a>
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Bottom bar */}
-      <div className="mx-auto mt-6 flex max-w-[var(--container-max)] flex-col items-center justify-between gap-3 px-4 md:flex-row">
-        <p className="text-xs text-brand-muted">
-          &copy; {new Date().getFullYear()} Faith Works. All rights reserved.
-        </p>
-        <div className="flex items-center gap-5">
-          <a href="/privacy-policy" className="text-xs text-brand-muted underline underline-offset-2 transition-colors hover:text-brand-dark">
-            Privacy Policy
-          </a>
-          <a href="/terms" className="text-xs text-brand-muted underline underline-offset-2 transition-colors hover:text-brand-dark">
-            Terms of Service
-          </a>
-          <a href="/cookies" className="text-xs text-brand-muted underline underline-offset-2 transition-colors hover:text-brand-dark">
-            Cookies Settings
-          </a>
-        </div>
+      {/* Huge background text underneath card - No overlap margin anymore & much more visible */}
+      <div 
+        ref={watermarkRef}
+        className="pointer-events-none relative pt-8 flex justify-center overflow-hidden -mb-10 lg:-mb-14"
+      >
+        {/* We use a gradient text mask to make it clearly visible but fading slightly at bottom */}
+        <span 
+          className="font-heading text-[28vw] font-black uppercase leading-[0.75] tracking-tighter"
+          style={{
+            background: "linear-gradient(to bottom, #FFFFFF 0%, rgba(255,255,255,0.7) 50%, rgba(255,255,255,0.1) 100%)",
+            WebkitBackgroundClip: "text",
+            WebkitTextFillColor: "transparent",
+            color: "transparent",
+          }}
+        > F<span style={{ fontFamily: 'Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial' }}>[</span>
+          <span style={{
+            background: 'linear-gradient(to bottom, #FCE82A 0%, rgba(252,232,42,0.75) 50%, rgba(252,232,42,0.15) 100%)',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent'
+          }}>
+            AI
+          </span>
+          <span style={{ fontFamily: 'Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial' }}>]</span>TH
+        </span>
       </div>
     </footer>
   )
