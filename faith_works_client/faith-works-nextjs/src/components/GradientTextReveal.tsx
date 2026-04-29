@@ -151,42 +151,39 @@ export function GradientTextReveal({
     const staggerEach = wordCount > 28 ? 0.11 : 0.14
     const tweenDuration = 0.16
 
-    words.forEach((word) => {
-      const finalColor = word.dataset.finalColor || activeColor
-      const initialColor = word.dataset.initialColor || inactiveColor
-
-      word.style.opacity = word.dataset.initialOpacity || "0.18"
-      word.style.color = initialColor
-
-      if (word.dataset.finalFill) {
-        word.style.webkitTextFillColor = word.dataset.finalFill
-      }
-
-      if (word.dataset.initialFill) {
-        word.style.webkitTextFillColor = word.dataset.initialFill
-      }
-
-      word.dataset.finalColor = finalColor
-    })
-
     const timeline = gsap.timeline({
       scrollTrigger: {
         trigger: wrapper,
         start: start,
         end: end,
         scrub: 0.7,
+        // Recalculate trigger bounds AND reset animation start-values on every
+        // ScrollTrigger.refresh() call (e.g. after the intro loader exits and
+        // layout is fully real).  Without this the progress can be stale after
+        // the loader-hidden phase and words jump to fully-revealed.
+        invalidateOnRefresh: true,
       },
     })
 
-    timeline.to(words, {
-      opacity: (_index, element) => element.dataset.finalOpacity || "1",
-      color: (_index, element) => element.dataset.finalColor || activeColor,
-      ease: "none",
-      duration: tweenDuration,
-      stagger: {
-        each: staggerEach,
+    // fromTo() stamps the FROM state immediately (immediateRender:true by default
+    // for the first tween in a timeline), so words are always dim when the
+    // component mounts, regardless of any previous scroll position measurement.
+    timeline.fromTo(
+      words,
+      {
+        opacity: (_index, element) => parseFloat(element.dataset.initialOpacity || "0.18"),
+        color: (_index, element) => element.dataset.initialColor || inactiveColor,
       },
-    })
+      {
+        opacity: (_index, element) => parseFloat(element.dataset.finalOpacity || "1"),
+        color: (_index, element) => element.dataset.finalColor || activeColor,
+        ease: "none",
+        duration: tweenDuration,
+        stagger: {
+          each: staggerEach,
+        },
+      }
+    )
 
     return () => {
       timeline.scrollTrigger?.kill()

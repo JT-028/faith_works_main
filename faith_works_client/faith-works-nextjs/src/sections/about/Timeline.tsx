@@ -1,13 +1,12 @@
 "use client"
 
-import { useRef, useState, useEffect } from "react"
+import { useRef, useState } from "react"
 import { useGSAP } from "@gsap/react"
 import gsap from "gsap"
 import { ScrollTrigger } from "gsap/ScrollTrigger"
-import { ScrollToPlugin } from "gsap/ScrollToPlugin"
 import { ChevronRight, ChevronsDown } from "lucide-react"
 
-gsap.registerPlugin(ScrollTrigger, ScrollToPlugin)
+gsap.registerPlugin(ScrollTrigger)
 
 interface Milestone {
   year: string
@@ -62,45 +61,8 @@ export function Timeline() {
   const wrapperRef = useRef<HTMLDivElement>(null)
   const panelRef = useRef<HTMLDivElement>(null)
   const cardRef = useRef<HTMLDivElement>(null)
-  const headingRef = useRef<HTMLDivElement>(null)
-  const headingAnimatedBySnap = useRef(false)
-
-  useEffect(() => {
-    function onSnapArrival() {
-      if (!headingRef.current) return
-      headingAnimatedBySnap.current = true
-      gsap.fromTo(
-        headingRef.current,
-        { opacity: 0, y: 30 },
-        { opacity: 1, y: 0, duration: 0.7, ease: "power3.out" }
-      )
-    }
-    window.addEventListener("faithworks:timeline-snap", onSnapArrival)
-    return () => window.removeEventListener("faithworks:timeline-snap", onSnapArrival)
-  }, [])
 
   useGSAP(() => {
-    // ── Heading entrance ──
-    ScrollTrigger.create({
-      trigger: wrapperRef.current,
-      start: "top top",
-      onEnter: () => {
-        if (headingAnimatedBySnap.current) {
-          headingAnimatedBySnap.current = false
-          return
-        }
-        gsap.fromTo(
-          headingRef.current,
-          { opacity: 0, y: 30 },
-          { opacity: 1, y: 0, duration: 0.7, ease: "power3.out" }
-        )
-      },
-      onLeaveBack: () => {
-        headingAnimatedBySnap.current = false
-        gsap.set(headingRef.current, { opacity: 0, y: 30 })
-      },
-    })
-
     // ── Scroll tracker: maps scroll progress → active milestone step ──
     ScrollTrigger.create({
       trigger: wrapperRef.current,
@@ -145,7 +107,7 @@ export function Timeline() {
       >
 
         {/* ── Section heading — visible on all sizes, compact on mobile ── */}
-        <div ref={headingRef} className="mx-auto w-full max-w-[var(--container-max)] opacity-0">
+        <div className="mx-auto w-full max-w-[var(--container-max)]">
           <div className="mb-4 text-center md:mb-8 lg:mb-10">
             <span className="text-xs font-semibold tracking-wide text-brand-dark md:text-sm">
               The Journey

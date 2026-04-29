@@ -1,68 +1,13 @@
 "use client"
 
-import { useRef, useEffect } from "react"
+import { useRef } from "react"
 import Link from "next/link"
 import { useGSAP } from "@gsap/react"
 import gsap from "gsap"
-import { ScrollToPlugin } from "gsap/ScrollToPlugin"
 import { ArrowRight, Sparkles } from "lucide-react"
-
-gsap.registerPlugin(ScrollToPlugin)
 
 export function AboutHero({ ready = false }: { ready?: boolean }) {
   const heroRef = useRef<HTMLElement>(null)
-
-  // Snap to Timeline on the first downward scroll from the hero
-  useEffect(() => {
-    const hero = heroRef.current
-    if (!hero) return
-
-    let snapping = false
-
-    function snapToTimeline() {
-      if (snapping) return
-      const timelineEl = document.getElementById("timeline")
-      if (!timelineEl) return
-      snapping = true
-      gsap.to(window, {
-        scrollTo: { y: timelineEl, offsetY: 0 },
-        duration: 0.9,
-        ease: "power3.inOut",
-        onComplete: () => {
-          snapping = false
-          window.dispatchEvent(new CustomEvent("faithworks:timeline-snap"))
-        },
-      })
-    }
-
-    function onWheel(e: WheelEvent) {
-      // Only intercept when still inside the hero
-      if (window.scrollY > hero!.offsetHeight * 0.6) return
-      if (e.deltaY <= 0) return
-      e.preventDefault()
-      snapToTimeline()
-    }
-
-    let touchStartY = 0
-    function onTouchStart(e: TouchEvent) {
-      touchStartY = e.touches[0].clientY
-    }
-    function onTouchEnd(e: TouchEvent) {
-      if (window.scrollY > hero!.offsetHeight * 0.6) return
-      const delta = touchStartY - e.changedTouches[0].clientY
-      if (delta > 40) snapToTimeline()
-    }
-
-    window.addEventListener("wheel", onWheel, { passive: false })
-    window.addEventListener("touchstart", onTouchStart, { passive: true })
-    window.addEventListener("touchend", onTouchEnd, { passive: true })
-
-    return () => {
-      window.removeEventListener("wheel", onWheel)
-      window.removeEventListener("touchstart", onTouchStart)
-      window.removeEventListener("touchend", onTouchEnd)
-    }
-  }, [])
 
   useGSAP(() => {
     if (!ready) return
