@@ -19,21 +19,22 @@ const logos = [
 
 export default function MediaLogoWall() {
   return (
-    <section className="py-24 bg-white">
+    <section className="py-24 bg-white overflow-hidden">
       <div className="mx-auto max-w-[var(--container-max)] px-6 lg:px-16 text-center">
         <h2 className="font-heading text-xl font-bold uppercase tracking-widest text-brand-muted/70 mb-12">
           As Featured In
         </h2>
-        <div className="mx-auto max-w-5xl opacity-80 mix-blend-multiply grayscale transition-all duration-500 hover:grayscale-0 hover:opacity-100">
-           <LogoLoop 
-             logos={logos}
-             speed={60}
-             direction="left"
-             logoHeight={56}
-             gap={64}
-             ariaLabel="Media partners"
-           />
-        </div>
+      </div>
+      <div className="w-full opacity-80 mix-blend-multiply grayscale transition-all duration-500 hover:grayscale-0 hover:opacity-100">
+        <LogoLoop 
+          logos={logos}
+          speed={60}
+          direction="left"
+          logoHeight={56}
+          gap={64}
+          width="100%"
+          ariaLabel="Media partners"
+        />
       </div>
     </section>
   )
