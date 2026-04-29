@@ -1,7 +1,11 @@
 "use client"
 
 import { createContext, useContext, useEffect, useRef, useState, type ReactNode } from "react"
+import gsap from "gsap"
+import { ScrollTrigger } from "gsap/ScrollTrigger"
 import IntroLoader from "@/components/IntroLoader"
+
+gsap.registerPlugin(ScrollTrigger)
 
 interface AppContextValue {
   ready: boolean
@@ -18,6 +22,14 @@ export function AppProvider({ children }: { children: ReactNode }) {
       document.body.style.overflow = "hidden"
     } else {
       document.body.style.overflow = ""
+      // Loader just finished — layout is now real. Two rAFs ensure we're past the
+      // first painted frame before asking ScrollTrigger to recalculate positions,
+      // so all scroll-triggered animations get accurate trigger coordinates.
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          ScrollTrigger.refresh()
+        })
+      })
     }
     return () => {
       document.body.style.overflow = ""

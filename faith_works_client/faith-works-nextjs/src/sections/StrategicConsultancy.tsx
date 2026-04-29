@@ -4,7 +4,7 @@ import { GradientTextReveal } from "@/components/GradientTextReveal"
 
 export function StrategicConsultancySection() {
   return (
-    <section className="bg-brand-dark py-[var(--section-padding-mobile)] lg:py-[var(--section-padding)]">
+    <section className="bg-brand-light py-[var(--section-padding-mobile)] lg:py-[var(--section-padding)]">
       <div className="mx-auto max-w-[var(--container-max)] px-6 lg:px-16">
         <div className="grid gap-16 lg:grid-cols-[1fr_1.5fr] lg:gap-24">
           {/* Left Column */}
@@ -12,7 +12,7 @@ export function StrategicConsultancySection() {
             <p className="mb-8 text-xs font-semibold tracking-widest text-[#a3a3a3] uppercase">
               ABOUT FAITH [AI]
             </p>
-            <h2 className="font-heading text-4xl font-bold leading-[1.05] tracking-tight text-white md:text-5xl lg:text-7xl">
+            <h2 className="font-heading text-4xl font-bold leading-[1.05] tracking-tight text-[#202020] md:text-5xl lg:text-7xl">
               STRATEGY.<br />
               RESILIENCE.<br />
               <span className="text-brand-gold">SCALE.</span>
@@ -23,8 +23,8 @@ export function StrategicConsultancySection() {
           <div className="flex flex-col justify-center">
             {/* Paragraphs — combined for a single continuous scroll reveal timeline */}
             <GradientTextReveal
-              activeColor="rgb(255, 255, 255)"
-              inactiveColor="rgb(45, 45, 45)"
+              activeColor="rgb(45, 45, 45)"
+              inactiveColor="rgb(20, 20, 20)"
               className="text-2xl font-medium leading-relaxed tracking-wide md:text-3xl lg:text-[2rem]"
               start="top 82%"
               end="top 18%"
