@@ -36,8 +36,10 @@ export function FinalCTASection() {
       />
 
       {/* Background decorative elements */}
-      <div className="pointer-events-none absolute top-0 -left-32 h-64 w-64 rounded-full bg-brand-gold/10 blur-3xl overflow-hidden" />
-      <div className="pointer-events-none absolute -bottom-32 -right-32 h-64 w-64 rounded-full bg-brand-pink/20 blur-3xl overflow-hidden" />
+      <div className="pointer-events-none absolute inset-0 overflow-hidden">
+        <div className="absolute top-0 -left-32 h-64 w-64 rounded-full bg-brand-gold/10 blur-3xl" />
+        <div className="absolute -bottom-32 -right-32 h-64 w-64 rounded-full bg-brand-pink/20 blur-3xl" />
+      </div>
 
       <div
         data-cta-content

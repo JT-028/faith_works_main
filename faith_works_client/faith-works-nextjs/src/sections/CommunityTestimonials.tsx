@@ -1,7 +1,8 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { Quote, Star } from "lucide-react"
+import { Quote, Star, ArrowRight } from "lucide-react"
+import Link from "next/link"
 
 const testimonials = [
   {
@@ -42,9 +43,9 @@ export function CommunityTestimonialsSection() {
     return () => clearInterval(interval)
   }, [])
 
-  const CARDS = 10;
+  const CARDS = 15;
   // Radius of the rotating circle
-  const RADIUS = 750; 
+  const RADIUS = 1050; 
 
   return (
     <section className="relative overflow-hidden bg-[#f9f9f9] pt-24 pb-0 text-[#202020]">
@@ -65,12 +66,12 @@ export function CommunityTestimonialsSection() {
       <div className="mx-auto max-w-7xl px-6 text-center relative z-10">
         
         {/* Top Header */}
-        <h2 className="font-heading mx-auto max-w-4xl text-6xl md:text-8xl font-black tracking-tight mb-8 leading-[0.9] text-[#202020]">
+        <h2 className="font-heading mx-auto max-w-4xl text-5xl sm:text-6xl md:text-8xl font-black tracking-tight mb-6 md:mb-8 leading-tight md:leading-[0.9] text-[#202020]">
           Community <span className="text-brand-pink">*</span><br />Built to Elevate
         </h2>
         
         {/* Pill Subtitle */}
-        <p className="mx-auto max-w-3xl text-lg md:text-xl text-black/70 leading-relaxed font-medium mb-12">
+        <p className="mx-auto max-w-3xl text-base sm:text-lg md:text-xl text-black/70 leading-relaxed font-medium mb-12">
           A network packed with <span className="bg-white px-2 py-0.5 rounded-md border border-black/10 text-black shadow-sm mx-1 inline-block">CEOs</span> &{" "}
           <span className="bg-white px-2 py-0.5 rounded-md border border-black/10 text-black shadow-sm mx-1 inline-block">Founders</span>, proven{" "}
           <span className="bg-white px-2 py-0.5 rounded-md border border-black/10 text-black shadow-sm mx-1 inline-block">strategies</span> and a supportive{" "}
@@ -84,10 +85,10 @@ export function CommunityTestimonialsSection() {
         Container must be tall enough to fit the top half of the circle. 
         Radius = 650px, Card half-height = 140px. 800px+ height is ideal. 
       */}
-      <div className="relative mx-auto w-full h-[700px] md:h-[850px] mt-8 overflow-hidden select-none">
+      <div className="relative mx-auto w-full h-[750px] md:h-[900px] mt-8 md:mt-76 select-none">
         
         {/* Center point of rotation at the exact bottom of the container (pushed down slightly) */}
-        <div className="absolute left-1/2 bottom-[-50px] w-0 h-0 z-10">
+        <div className="absolute left-1/2 bottom-[-30px] md:bottom-[-50px] w-0 h-0 z-10 scale-[0.65] md:scale-100">
           
           {/* Rotating Wrapper */}
           <div className="absolute inset-0 animate-carousel-spin">
@@ -140,9 +141,9 @@ export function CommunityTestimonialsSection() {
 
         {/* Center Element: Testimonial Box */}
         {/* Placed slightly above the center pivot point */}
-        <div className="absolute left-1/2 bottom-[100px] md:bottom-[180px] -translate-x-1/2 w-[90%] max-w-[500px] md:max-w-[700px] p-8 z-20 flex flex-col justify-center text-center">
+        <div className="absolute left-1/2 bottom-[200px] md:bottom-[220px] -translate-x-1/2 w-[90%] max-w-[500px] md:max-w-[700px] z-20 flex flex-col justify-center text-center">
           
-          <div className="relative w-full h-[220px] md:h-[200px] flex items-center justify-center">
+          <div className="relative w-full h-[220px] md:h-[250px] flex items-center justify-center">
             {testimonials.map((test, i) => (
               <div
                 key={i}
@@ -163,6 +164,19 @@ export function CommunityTestimonialsSection() {
                 </div>
               </div>
             ))}
+          </div>
+
+          <div className="mt-8 flex justify-center pointer-events-auto">
+            <Link
+              href="/community"
+              className="group inline-flex items-center gap-2 rounded-full bg-brand-dark px-8 py-4 text-sm font-semibold text-white shadow-lg transition-all hover:scale-105 hover:bg-brand-navy"
+            >
+              Join the Community
+              <ArrowRight
+                size={16}
+                className="transition-transform group-hover:translate-x-1"
+              />
+            </Link>
           </div>
 
         </div>
