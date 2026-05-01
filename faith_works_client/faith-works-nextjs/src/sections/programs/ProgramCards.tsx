@@ -29,15 +29,14 @@ const CSS = `
     margin: 0 auto;
   }
 
-  /* ── Stack container: grid rows give each card scroll distance ── */
+  /* ── Stack container: flex column allows sticky items to overlap ── */
   .pcs-list {
     list-style: none;
     padding: 0 5%;
     margin: 0 auto;
     max-width: var(--container-max, 1200px);
-    display: grid;
-    grid-template-columns: 1fr;
-    grid-template-rows: repeat(3, var(--card-height));
+    display: flex;
+    flex-direction: column;
     gap: var(--card-margin);
     padding-bottom: calc(3 * var(--card-margin));
     box-sizing: border-box;
@@ -55,6 +54,12 @@ const CSS = `
   .pcs-card:nth-child(2) { --index: 2; --reverse-index: 1; z-index: 2; }
   .pcs-card:nth-child(3) { --index: 3; --reverse-index: 0; z-index: 3; }
 
+  /* ── Card Entrance Wrapper (Managed by GSAP) ── */
+  .pcs-card-entrance-wrapper {
+    height: 100%;
+    /* We let GSAP handle opacity and transform */
+  }
+
   /* ── Card inner: CSS scroll-driven scale + darken on exit ── */
   .pcs-card__inner {
     box-sizing: border-box;
@@ -68,10 +73,17 @@ const CSS = `
     overflow: hidden;
     position: relative;
     transform-origin: 50% 0%;
+    /* Optional: fallback native CSS scroll animation, but GSAP handles entrance.
+       If browser supports animation-timeline, it applies this exit animation. */
     will-change: transform, filter;
-    animation: pcs-scale-card linear forwards;
-    animation-timeline: view();
-    animation-range: exit-crossing 0% exit-crossing 100%;
+  }
+
+  @supports (animation-timeline: view()) {
+    .pcs-card__inner {
+      animation: pcs-scale-card linear forwards;
+      animation-timeline: view();
+      animation-range: exit-crossing 0% exit-crossing 100%;
+    }
   }
 
   /* ── Brand-palette card backgrounds ── */
@@ -216,14 +228,16 @@ const programs: ProgramCard[] = [
 ]
 
 export function ProgramCards() {
+  const containerRef = useRef<HTMLDivElement>(null)
   const headingRef = useRef<HTMLDivElement>(null)
+  const cardsRef = useRef<(HTMLLIElement | null)[]>([])
+  const wrapperRefs = useRef<(HTMLDivElement | null)[]>([])
 
   useGSAP(() => {
     gsap.from(headingRef.current, {
-      immediateRender: false,
       scrollTrigger: {
         trigger: headingRef.current,
-        start: "top 82%",
+        start: "top 85%",
         toggleActions: "play none none none",
       },
       y: 30,
@@ -231,12 +245,36 @@ export function ProgramCards() {
       duration: 0.6,
       ease: "power3.out",
     })
-  })
+
+    // Entrance animation for the program cards
+    const wrappers = gsap.utils.toArray('.pcs-card-entrance-wrapper')
+    const cards = gsap.utils.toArray('.pcs-card')
+
+    wrappers.forEach((wrapper: any, index) => {
+      const card = cards[index] as HTMLElement
+      if (!card || !wrapper) return
+      
+      gsap.fromTo(wrapper,
+        { opacity: 0, y: 100 },
+        {
+          scrollTrigger: {
+            trigger: card,
+            start: "top 90%", // Trigger slightly earlier so it catches as soon as it enters 
+            toggleActions: "play none none reverse",
+          },
+          opacity: 1,
+          y: 0,
+          duration: 0.8,
+          ease: "power3.out", // Regular ease just to be safe
+        }
+      )
+    })
+  }, { scope: containerRef, dependencies: [] })
 
   return (
     <>
       <style dangerouslySetInnerHTML={{ __html: CSS }} />
-      <section id="programs" className="pcs-section">
+      <section id="programs" ref={containerRef} className="pcs-section">
         {/* Section header */}
         <div ref={headingRef} className="pcs-header">
           <h2 className="font-heading text-[1.75rem] font-bold tracking-tight text-brand-dark md:text-3xl">
@@ -249,24 +287,32 @@ export function ProgramCards() {
 
         {/* Sticky stacking cards */}
         <ul className="pcs-list">
-          {programs.map((program) => (
-            <li key={program.num} className="pcs-card">
-              <div className="pcs-card__inner">
-                <span className="pcs-num" aria-hidden="true">{program.num}</span>
+          {programs.map((program, index) => (
+            <li 
+              key={program.num} 
+              className="pcs-card"
+            >
+              <div 
+                className="pcs-card-entrance-wrapper" 
+                style={{ height: '100%', willChange: 'opacity, transform' }}
+              >
+                <div className="pcs-card__inner">
+                  <span className="pcs-num" aria-hidden="true">{program.num}</span>
 
-                <div>
-                  <span className="pcs-tag">
-                    {program.icon}
-                    {program.tag}
-                  </span>
-                  <h3 className="pcs-title">{program.title}</h3>
-                  <p className="pcs-desc">{program.description}</p>
+                  <div>
+                    <span className="pcs-tag">
+                      {program.icon}
+                      {program.tag}
+                    </span>
+                    <h3 className="pcs-title">{program.title}</h3>
+                    <p className="pcs-desc">{program.description}</p>
+                  </div>
+
+                  <Link href={program.ctaHref} className="pcs-cta">
+                    {program.ctaLabel}
+                    <ArrowRight className="h-4 w-4" />
+                  </Link>
                 </div>
-
-                <Link href={program.ctaHref} className="pcs-cta">
-                  {program.ctaLabel}
-                  <ArrowRight className="h-4 w-4" />
-                </Link>
               </div>
             </li>
           ))}

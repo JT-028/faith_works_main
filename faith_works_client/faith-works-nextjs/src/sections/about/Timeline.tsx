@@ -64,15 +64,41 @@ export function Timeline() {
 
   useGSAP(() => {
     // ── Scroll tracker: maps scroll progress → active milestone step ──
-    ScrollTrigger.create({
+    const st = ScrollTrigger.create({
       trigger: wrapperRef.current,
       start: "top top",
       end: "bottom bottom",
+      onLeave: () => { activeIndexRef.current = -1 },
+      onLeaveBack: () => { activeIndexRef.current = -1 },
+      onEnter: () => {
+        // Force the first card to animate in when we enter from the top
+        activeIndexRef.current = 0
+        setActiveIndex(0)
+        if (cardRef.current) {
+          gsap.fromTo(
+            cardRef.current,
+            { opacity: 0, y: 48 },
+            { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }
+          )
+        }
+      },
+      onEnterBack: () => {
+        // Force the last card to animate in when we enter from the bottom
+        activeIndexRef.current = NUM - 1
+        setActiveIndex(NUM - 1)
+        if (cardRef.current) {
+          gsap.fromTo(
+            cardRef.current,
+            { opacity: 0, y: -48 },
+            { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }
+          )
+        }
+      },
       onUpdate: (self) => {
         const rawIdx = self.progress * (NUM - 1)
         const newIdx = Math.min(NUM - 1, Math.round(rawIdx))
 
-        if (newIdx !== activeIndexRef.current) {
+        if (newIdx !== activeIndexRef.current && activeIndexRef.current !== -1) {
           const direction = newIdx > activeIndexRef.current ? 1 : -1
           activeIndexRef.current = newIdx
           setActiveIndex(newIdx)
@@ -89,6 +115,10 @@ export function Timeline() {
         }
       },
     })
+    
+    return () => {
+      st.kill()
+    }
   }, { scope: wrapperRef })
 
   const active = milestones[activeIndex]
