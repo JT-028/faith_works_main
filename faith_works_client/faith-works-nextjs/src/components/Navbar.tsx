@@ -7,18 +7,19 @@ import Image from "next/image"
 import { cn } from "@/lib/utils"
 
 const NAV_LINKS = [
-  { num: "01", href: "/about",     label: "About Faith" },
-  { num: "02", href: "/programs",  label: "Programs" },
-  { num: "03", href: "/community", label: "Community" },
-  { num: "04", href: "/speaking",  label: "Speaking" },
+  { num: "01", href: "/",          label: "Home" },
+  { num: "02", href: "/about",     label: "About Faith" },
+  { num: "03", href: "/programs",  label: "Programs" },
+  { num: "04", href: "/community", label: "Community" },
   { num: "05", href: "/events",    label: "Events" },
   { num: "06", href: "/media",     label: "Media" },
 ]
 
 const DESKTOP_UTILITY_LINKS = [
-  { href: "/", label: "Home" },
-  { href: "/programs", label: "Apply to Accelerator" },
-  { href: "/community", label: "Join the Community" },
+  { href: "/programs", label: "Accelerator Enrollment LP" },
+  { href: "/events", label: "AI Workshop Registration LP" },
+  { href: "/media", label: "Lead Magnet Download LP" },
+  { href: "/speaking", label: "Keynote / Speaking Inquiry LP" },
 ]
 
 const OVERLAY_CSS = `
