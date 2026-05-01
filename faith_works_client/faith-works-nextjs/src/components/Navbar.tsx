@@ -516,6 +516,7 @@ export function Navbar() {
   const [isOpen, setIsOpen] = useState(false)
   const [isScrolled, setIsScrolled] = useState(false)
   const [isDesktopNavVisible, setIsDesktopNavVisible] = useState(true)
+  const [isMounted, setIsMounted] = useState(false)
   const mobileOverlayRef = useRef<HTMLDivElement>(null)
   const desktopOverlayRef = useRef<HTMLDivElement>(null)
   const lastFocusedElementRef = useRef<HTMLElement | null>(null)
@@ -541,6 +542,10 @@ export function Navbar() {
     shouldRestoreFocusRef.current = false
     setIsOpen(true)
   }
+
+  useEffect(() => {
+    setIsMounted(true)
+  }, [])
 
   // Close on route change
   useEffect(() => {
@@ -693,9 +698,17 @@ export function Navbar() {
     firstFocusable?.focus()
   }, [isOpen])
 
+  // Top-bar specific pages logic
+  const isTopBarDarkPage = isMounted && ["/", "/about", "/events", "/media"].includes(pathname || "")
+  // Re-adjust colors logic based on scrolling + route
+  const desktopTopTextColor = isTopBarDarkPage ? "text-brand-dark" : "text-white"
+  const desktopTopBorderColor = isTopBarDarkPage ? "border-brand-dark/20" : "border-white/20"
+  const desktopTopHoverBg = isTopBarDarkPage ? "hover:bg-brand-dark/10" : "hover:bg-white/10"
+  const mobileTopBurgerColor = isTopBarDarkPage ? "bg-black/6 text-brand-dark hover:bg-black/12" : "bg-black/20 text-white"
+
   const mobileLogoSrc = isScrolled && !isOpen
-    ? "/images/faithworks.png"
-    : "/images/faithworks-black.png"
+    ? "/images/faithworks.png" /* NOTE: you may also want to use the black here based on your theme, we use the standard when scrolled-in */
+    : (isTopBarDarkPage && !isScrolled) ? "/images/faithworks-black.png" : "/images/faithworks.png"
 
   return (
     <>
@@ -710,7 +723,8 @@ export function Navbar() {
                 ? "bg-transparent text-brand-dark"
                 : isScrolled
                 ? "border border-white/55 bg-white/70 text-brand-dark shadow-[0_18px_40px_rgba(12,9,10,0.08)] backdrop-blur-2xl"
-                : "bg-white/40 text-brand-dark backdrop-blur-xl"
+                : "bg-white/40 backdrop-blur-xl",
+              !isOpen && !isScrolled ? (isTopBarDarkPage ? "text-brand-dark" : "text-white") : ""
             )}
           >
             <Link
@@ -743,7 +757,7 @@ export function Navbar() {
                   ? "bg-brand-dark/8 text-brand-dark hover:bg-brand-dark/14"
                   : isScrolled
                   ? "bg-brand-pink/12 text-brand-dark hover:bg-brand-pink/22"
-                  : "bg-black/6 text-brand-dark hover:bg-black/12"
+                  : mobileTopBurgerColor
               )}
             >
               <span
@@ -784,7 +798,7 @@ export function Navbar() {
                 ? "w-full max-w-none px-8 lg:px-12 xl:px-16 mt-0 h-[5.5rem] rounded-none border-transparent bg-transparent shadow-none backdrop-blur-0 text-brand-dark"
                 : isScrolled
                 ? "w-[calc(100vw-2rem)] lg:w-[calc(100vw-4rem)] max-w-none px-8 lg:px-10 mt-4 h-[5rem] rounded-[999px] border border-white/20 bg-brand-pink/15 shadow-[0_20px_54px_rgba(0,0,0,0.15)] backdrop-blur-2xl text-[#202020]"
-                : "w-full max-w-none px-8 lg:px-12 xl:px-16 mt-0 h-[5.5rem] rounded-none border-transparent bg-transparent shadow-none backdrop-blur-0 text-white"
+                : cn("w-full max-w-none px-8 lg:px-12 xl:px-16 mt-0 h-[5.5rem] rounded-none border-transparent bg-transparent shadow-none backdrop-blur-0", desktopTopTextColor)
             )}
           >
             <button
@@ -806,7 +820,7 @@ export function Navbar() {
                 data-navbar-logo-anchor
               >
                 <Image
-                  src={isOpen || (isScrolled && !isOpen) ? "/images/faithworks-black.png" : "/images/faithworks.png"}
+                  src={isOpen || (isTopBarDarkPage && !isScrolled) || (isScrolled && !isOpen) ? "/images/faithworks-black.png" : "/images/faithworks.png"}
                   alt="Faith Works"
                   width={230}
                   height={82}
@@ -829,7 +843,7 @@ export function Navbar() {
                   ? "border-brand-dark/20 bg-transparent hover:bg-brand-dark/6 text-brand-dark"
                   : isScrolled
                   ? "border-transparent bg-[#202020]/5 hover:bg-[#202020]/10 text-[#202020]"
-                  : "border-white/20 bg-transparent hover:bg-white/10 text-white"
+                  : cn("bg-transparent", desktopTopBorderColor, desktopTopHoverBg, desktopTopTextColor)
               )}
             >
               Join the Accelerator
